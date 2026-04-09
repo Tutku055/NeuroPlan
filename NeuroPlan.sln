@@ -1,0 +1,57 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1A1C1C1C-1A1C-1C1C-1A1C-1C1C1C1C1C1C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{2B2B2B2B-2B2B-2B2B-2B2B-2B2B2B2B2B2B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{3C3C3C3C-3C3C-3C3C-3C3C-3C3C3C3C3C3C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Domain", "src\Backend\NeuroPlan.Domain\NeuroPlan.Domain.csproj", "{4D4D4D4D-4D4D-4D4D-4D4D-4D4D4D4D4D4D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Application", "src\Backend\NeuroPlan.Application\NeuroPlan.Application.csproj", "{5E5E5E5E-5E5E-5E5E-5E5E-5E5E5E5E5E5E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Infrastructure", "src\Backend\NeuroPlan.Infrastructure\NeuroPlan.Infrastructure.csproj", "{6F6F6F6F-6F6F-6F6F-6F6F-6F6F6F6F6F6F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.API", "src\Backend\NeuroPlan.API\NeuroPlan.API.csproj", "{7A7A7A7A-7A7A-7A7A-7A7A-7A7A7A7A7A7A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Tests", "src\Backend\NeuroPlan.Tests\NeuroPlan.Tests.csproj", "{8B8B8B8B-8B8B-8B8B-8B8B-8B8B8B8B8B8B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4D4D4D4D-4D4D-4D4D-4D4D-4D4D4D4D4D4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D4D4D4D-4D4D-4D4D-4D4D-4D4D4D4D4D4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D4D4D4D-4D4D-4D4D-4D4D-4D4D4D4D4D4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D4D4D4D-4D4D-4D4D-4D4D-4D4D4D4D4D4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E5E5E5E-5E5E-5E5E-5E5E-5E5E5E5E5E5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E5E5E5E-5E5E-5E5E-5E5E-5E5E5E5E5E5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E5E5E5E-5E5E-5E5E-5E5E-5E5E5E5E5E5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E5E5E5E-5E5E-5E5E-5E5E-5E5E5E5E5E5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F6F6F6F-6F6F-6F6F-6F6F-6F6F6F6F6F6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F6F6F6F-6F6F-6F6F-6F6F-6F6F6F6F6F6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F6F6F6F-6F6F-6F6F-6F6F-6F6F6F6F6F6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F6F6F6F-6F6F-6F6F-6F6F-6F6F6F6F6F6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A7A7A7A-7A7A-7A7A-7A7A-7A7A7A7A7A7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A7A7A7A-7A7A-7A7A-7A7A-7A7A7A7A7A7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A7A7A7A-7A7A-7A7A-7A7A-7A7A7A7A7A7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A7A7A7A-7A7A-7A7A-7A7A-7A7A7A7A7A7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B8B8B8B-8B8B-8B8B-8B8B-8B8B8B8B8B8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B8B8B8B-8B8B-8B8B-8B8B-8B8B8B8B8B8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B8B8B8B-8B8B-8B8B-8B8B-8B8B8B8B8B8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B8B8B8B-8B8B-8B8B-8B8B-8B8B8B8B8B8B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2B2B2B2B-2B2B-2B2B-2B2B-2B2B2B2B2B2B} = {1A1C1C1C-1A1C-1C1C-1A1C-1C1C1C1C1C1C}
+		{3C3C3C3C-3C3C-3C3C-3C3C-3C3C3C3C3C3C} = {1A1C1C1C-1A1C-1C1C-1A1C-1C1C1C1C1C1C}
+		{4D4D4D4D-4D4D-4D4D-4D4D-4D4D4D4D4D4D} = {2B2B2B2B-2B2B-2B2B-2B2B-2B2B2B2B2B2B}
+		{5E5E5E5E-5E5E-5E5E-5E5E-5E5E5E5E5E5E} = {2B2B2B2B-2B2B-2B2B-2B2B-2B2B2B2B2B2B}
+		{6F6F6F6F-6F6F-6F6F-6F6F-6F6F6F6F6F6F} = {2B2B2B2B-2B2B-2B2B-2B2B-2B2B2B2B2B2B}
+		{7A7A7A7A-7A7A-7A7A-7A7A-7A7A7A7A7A7A} = {2B2B2B2B-2B2B-2B2B-2B2B-2B2B2B2B2B2B}
+		{8B8B8B8B-8B8B-8B8B-8B8B-8B8B8B8B8B8B} = {2B2B2B2B-2B2B-2B2B-2B2B-2B2B2B2B2B2B}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,29 @@
+{
+  "name": "neuroplan-web",
+  "version": "1.0.0",
+  "description": "NeuroPlan - React + Vite Frontend",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.x.x"
+  },
+  "devDependencies": {
+    "@types/react": "^18.x.x",
+    "@types/react-dom": "^18.x.x",
+    "@typescript-eslint/eslint-plugin": "^6.x.x",
+    "@typescript-eslint/parser": "^6.x.x",
+    "@vitejs/plugin-react": "^4.x.x",
+    "eslint": "^8.x.x",
+    "eslint-plugin-react-hooks": "^4.x.x",
+    "typescript": "^5.x.x",
+    "vite": "^5.x.x"
+  }
+}
