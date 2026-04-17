@@ -96,7 +96,7 @@ builder.Services.AddCors(options =>
                         .AllowCredentials());
 });
 
-// Add services to the container.
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -121,7 +121,7 @@ using (var scope = app.Services.CreateScope())
     SeedAuthorizationData(db);
 }
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
