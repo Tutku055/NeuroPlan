@@ -1,0 +1,21 @@
+﻿using System;
+using System.Collections.Generic;
+using NeuroPlan.Domain.Enums;
+
+namespace NeuroPlan.Domain.Entities
+{
+    public class ProjectGroup : BaseEntity
+    {
+        public int CompanyId { get; set; }
+        public int? ParentGroupId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public EntityStatus Status { get; set; } = EntityStatus.Waiting;
+
+        // Navigation Properties
+        public Company Company { get; set; }
+        public ProjectGroup ParentGroup { get; set; }
+        public ICollection<ProjectGroup> SubGroups { get; set; }
+        public ICollection<Project> Projects { get; set; }
+    }
+}
