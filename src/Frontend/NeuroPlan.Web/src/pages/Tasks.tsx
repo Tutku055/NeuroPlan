@@ -295,7 +295,7 @@ export const Tasks: React.FC = () => {
           )}
           <div>
             <h1 style={{ marginBottom: "0.15rem" }}>
-              {projectName ? `${projectName} â€“ Tasks` : "Tasks"}
+              {projectName ? `${projectName} - Tasks` : "Tasks"}
             </h1>
             <p style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>
               {projectName
@@ -592,169 +592,198 @@ export const Tasks: React.FC = () => {
                           <div
                             style={{
                               display: "flex",
-                              gap: "0.4rem",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              gap: "0.5rem",
                               width: "100%",
                             }}
                           >
-                            {t.status !== 2 &&
-                              t.status !== 4 &&
-                              t.status !== 3 && (
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "0.4rem",
+                                flexWrap: "wrap",
+                              }}
+                            >
+                              {t.status !== 2 &&
+                                t.status !== 4 &&
+                                t.status !== 3 && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      updateTaskStatus(t, 2);
+                                    }}
+                                    title="Set to In Progress"
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "0.3rem",
+                                      padding: "0.4rem 0.7rem",
+                                      background: "rgba(14,165,233,0.1)",
+                                      border: "1px solid rgba(14,165,233,0.2)",
+                                      color: "#0ea5e9",
+                                      borderRadius: 8,
+                                      cursor: "pointer",
+                                      fontSize: "0.75rem",
+                                      fontWeight: 500,
+                                      transition: "all 0.15s",
+                                    }}
+                                  >
+                                    <Play size={12} /> Start
+                                  </button>
+                                )}
+
+                              {t.status === 2 && (
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    updateTaskStatus(t, 2);
+                                    updateTaskStatus(t, 1);
                                   }}
-                                  title="Set to In Progress"
+                                  title="Revert to Planned"
                                   style={{
-                                    flex: 1,
                                     display: "flex",
                                     alignItems: "center",
-                                    justifyContent: "center",
-                                    gap: "0.2rem",
-                                    padding: "0.45rem",
-                                    background: "rgba(14,165,233,0.1)",
-                                    border: "1px solid rgba(14,165,233,0.2)",
-                                    color: "#0ea5e9",
+                                    gap: "0.3rem",
+                                    padding: "0.4rem 0.7rem",
+                                    background: "rgba(139,139,255,0.1)",
+                                    border: "1px solid rgba(139,139,255,0.2)",
+                                    color: "#8b8bff",
                                     borderRadius: 8,
                                     cursor: "pointer",
+                                    fontSize: "0.75rem",
+                                    fontWeight: 500,
                                     transition: "all 0.15s",
                                   }}
                                 >
-                                  <Play size={12} /> Start
+                                  <Square size={12} /> Pause
                                 </button>
                               )}
 
-                            {t.status === 2 && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  updateTaskStatus(t, 1);
-                                }}
-                                title="Revert to Planned"
-                                style={{
-                                  flex: 1,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  gap: "0.2rem",
-                                  padding: "0.45rem",
-                                  background: "rgba(139,139,255,0.1)",
-                                  border: "1px solid rgba(139,139,255,0.2)",
-                                  color: "#8b8bff",
-                                  borderRadius: 8,
-                                  cursor: "pointer",
-                                  transition: "all 0.15s",
-                                }}
-                              >
-                                <Square size={12} /> Pause
-                              </button>
-                            )}
+                              {t.status !== 4 && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    updateTaskStatus(t, 4);
+                                  }}
+                                  title="Set to Done"
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.3rem",
+                                    padding: "0.4rem 0.7rem",
+                                    background: "rgba(34,197,94,0.1)",
+                                    border: "1px solid rgba(34,197,94,0.2)",
+                                    color: "#22c55e",
+                                    borderRadius: 8,
+                                    cursor: "pointer",
+                                    fontSize: "0.75rem",
+                                    fontWeight: 500,
+                                    transition: "all 0.15s",
+                                  }}
+                                >
+                                  <CheckCheck size={12} /> Done
+                                </button>
+                              )}
 
-                            {t.status !== 4 && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  updateTaskStatus(t, 4);
-                                }}
-                                title="Set to Done"
-                                style={{
-                                  flex: 1,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  gap: "0.2rem",
-                                  padding: "0.45rem",
-                                  background: "rgba(34,197,94,0.1)",
-                                  border: "1px solid rgba(34,197,94,0.2)",
-                                  color: "#22c55e",
-                                  borderRadius: 8,
-                                  cursor: "pointer",
-                                  transition: "all 0.15s",
-                                }}
-                              >
-                                <CheckCheck size={12} /> Done
-                              </button>
-                            )}
+                              {t.status !== 3 && t.status !== 4 && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    updateTaskStatus(t, 3);
+                                  }}
+                                  title="Cancel Task"
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.3rem",
+                                    padding: "0.4rem 0.7rem",
+                                    background: "rgba(239,68,68,0.1)",
+                                    border: "1px solid rgba(239,68,68,0.2)",
+                                    color: "#ef4444",
+                                    borderRadius: 8,
+                                    cursor: "pointer",
+                                    fontSize: "0.75rem",
+                                    fontWeight: 500,
+                                    transition: "all 0.15s",
+                                  }}
+                                >
+                                  <XCircle size={12} /> Cancel
+                                </button>
+                              )}
+                            </div>
 
-                            {t.status !== 3 && t.status !== 4 && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  updateTaskStatus(t, 3);
-                                }}
-                                title="Cancel Task"
-                                style={{
-                                  flex: 1,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  gap: "0.2rem",
-                                  padding: "0.45rem",
-                                  background: "rgba(239,68,68,0.1)",
-                                  border: "1px solid rgba(239,68,68,0.2)",
-                                  color: "#ef4444",
-                                  borderRadius: 8,
-                                  cursor: "pointer",
-                                  transition: "all 0.15s",
-                                }}
-                              >
-                                <XCircle size={12} /> Cancel
-                              </button>
-                            )}
-
-                            <div style={{ flex: 1 }} />
-                            <button
-                              onClick={() => openEdit(t)}
-                              title="Edit"
+                            <div
                               style={{
-                                background: "none",
-                                border: "none",
-                                cursor: "pointer",
-                                color: "var(--text-muted)",
-                                padding: "0.3rem",
-                                borderRadius: 6,
                                 display: "flex",
-                                transition: "color 0.15s",
+                                gap: "0.25rem",
+                                alignItems: "center",
                               }}
-                              onMouseEnter={(e) =>
-                                ((
-                                  e.currentTarget as HTMLButtonElement
-                                ).style.color = "#fff")
-                              }
-                              onMouseLeave={(e) =>
-                                ((
-                                  e.currentTarget as HTMLButtonElement
-                                ).style.color = "var(--text-muted)")
-                              }
                             >
-                              <Pencil size={13} />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(t)}
-                              title="Delete"
-                              style={{
-                                background: "none",
-                                border: "none",
-                                cursor: "pointer",
-                                color: "var(--text-muted)",
-                                padding: "0.3rem",
-                                borderRadius: 6,
-                                display: "flex",
-                                transition: "color 0.15s",
-                              }}
-                              onMouseEnter={(e) =>
-                                ((
-                                  e.currentTarget as HTMLButtonElement
-                                ).style.color = "#ef4444")
-                              }
-                              onMouseLeave={(e) =>
-                                ((
-                                  e.currentTarget as HTMLButtonElement
-                                ).style.color = "var(--text-muted)")
-                              }
-                            >
-                              <Trash2 size={13} />
-                            </button>
+                              <button
+                                onClick={() => openEdit(t)}
+                                title="Edit"
+                                style={{
+                                  background: "none",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  color: "var(--text-muted)",
+                                  padding: "0.4rem",
+                                  borderRadius: 8,
+                                  display: "flex",
+                                  transition: "all 0.15s",
+                                }}
+                                onMouseEnter={(e) => {
+                                  (
+                                    e.currentTarget as HTMLButtonElement
+                                  ).style.color = "#fff";
+                                  (
+                                    e.currentTarget as HTMLButtonElement
+                                  ).style.background = "rgba(255,255,255,0.05)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  (
+                                    e.currentTarget as HTMLButtonElement
+                                  ).style.color = "var(--text-muted)";
+                                  (
+                                    e.currentTarget as HTMLButtonElement
+                                  ).style.background = "none";
+                                }}
+                              >
+                                <Pencil size={14} />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(t)}
+                                title="Delete"
+                                style={{
+                                  background: "none",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  color: "var(--text-muted)",
+                                  padding: "0.4rem",
+                                  borderRadius: 8,
+                                  display: "flex",
+                                  transition: "all 0.15s",
+                                }}
+                                onMouseEnter={(e) => {
+                                  (
+                                    e.currentTarget as HTMLButtonElement
+                                  ).style.color = "#ef4444";
+                                  (
+                                    e.currentTarget as HTMLButtonElement
+                                  ).style.background = "rgba(239,68,68,0.08)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  (
+                                    e.currentTarget as HTMLButtonElement
+                                  ).style.color = "var(--text-muted)";
+                                  (
+                                    e.currentTarget as HTMLButtonElement
+                                  ).style.background = "none";
+                                }}
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -800,14 +829,14 @@ export const Tasks: React.FC = () => {
             </FormField>
             <FormField label="Title *">
               <InputField
-                placeholder="Task titleâ€¦"
+                placeholder="Task title"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
               />
             </FormField>
             <FormField label="Description">
               <textarea
-                placeholder="Detailsâ€¦"
+                placeholder="Details"
                 value={form.description}
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
@@ -817,7 +846,7 @@ export const Tasks: React.FC = () => {
                 style={{ resize: "vertical", lineHeight: 1.6 }}
               />
             </FormField>
-            <FormField label="Complexity (1 â€“ 10)">
+            <FormField label="Complexity (1 - 10)">
               <InputField
                 type="number"
                 min="1"
@@ -857,11 +886,7 @@ export const Tasks: React.FC = () => {
                 Cancel
               </Button>
               <Button onClick={handleSave} disabled={saving}>
-                {saving
-                  ? "Savingâ€¦"
-                  : editTarget
-                    ? "Update Task"
-                    : "Create Task"}
+                {saving ? "Saving" : editTarget ? "Update Task" : "Create Task"}
               </Button>
             </div>
           </div>
