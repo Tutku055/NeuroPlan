@@ -19,11 +19,13 @@ interface UserItem {
   email: string;
   roleId: string;
   roleName: string;
+  roleColor?: string;
 }
 
 interface RoleOption {
   id: string;
   name: string;
+  color?: string;
 }
 
 const EMPTY_FORM = {
@@ -75,7 +77,11 @@ export const Users: React.FC = () => {
       ]);
       setUsers(usersRes.data);
       setRoles(
-        rolesRes.data.map((r: any) => ({ id: r.id, name: r.name })),
+        rolesRes.data.map((r: any) => ({
+          id: r.id,
+          name: r.name,
+          color: r.color,
+        })),
       );
     } catch {}
     setLoading(false);
@@ -107,12 +113,12 @@ export const Users: React.FC = () => {
   const handleDelete = async (u: UserItem) => {
     const ok = await confirm(
       `Delete "${u.fullName}"?`,
-      "This user will be soft-deleted and can no longer log in.",
+      "This user will be soft-deleted and can no longer log in. Existing worklogs remain preserved.",
     );
     if (!ok) return;
     try {
       await api.delete(`/users/${u.id}`);
-      toast("success", "User deleted", `"${u.fullName}" was removed.`);
+      toast("success", "User soft-deleted", `"${u.fullName}" was archived.`);
       fetchData();
     } catch (e: any) {
       toast(
@@ -173,9 +179,13 @@ export const Users: React.FC = () => {
     setSaving(false);
   };
 
-  const getRoleColor = (name: string) => {
-    if (name === "Admin") return "#a855f7";
-    if (name === "Manager") return "#0ea5e9";
+  const isHexColor = (value?: string) =>
+    /^#[0-9A-Fa-f]{6}$/.test((value || "").trim());
+
+  const getRoleColor = (name: string, color?: string) => {
+    if (isHexColor(color)) return color!.trim().toUpperCase();
+    if (name === "Admin") return "#EF4444";
+    if (name === "Manager") return "#0EA5E9";
     return "#10b981";
   };
 
@@ -200,10 +210,7 @@ export const Users: React.FC = () => {
             variant="secondary"
             onClick={fetchData}
             icon={
-              <RefreshCw
-                size={15}
-                className={loading ? "animate-spin" : ""}
-              />
+              <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
             }
           >
             Refresh
@@ -265,97 +272,104 @@ export const Users: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => (
-                  <tr key={u.id}>
-                    <td style={{ fontWeight: 500 }}>{u.fullName}</td>
-                    <td style={{ color: "var(--text-secondary)" }}>
-                      {u.email}
-                    </td>
-                    <td>
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "0.35rem",
-                          padding: "0.15rem 0.6rem",
-                          background: `${getRoleColor(u.roleName)}15`,
-                          color: getRoleColor(u.roleName),
-                          borderRadius: 99,
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                        }}
-                      >
+                {users.map((u) => {
+                  const roleColor = getRoleColor(u.roleName, u.roleColor);
+                  return (
+                    <tr key={u.id}>
+                      <td style={{ fontWeight: 500 }}>{u.fullName}</td>
+                      <td style={{ color: "var(--text-secondary)" }}>
+                        {u.email}
+                      </td>
+                      <td>
                         <span
                           style={{
-                            width: 5,
-                            height: 5,
-                            borderRadius: "50%",
-                            background: getRoleColor(u.roleName),
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.35rem",
+                            padding: "0.15rem 0.6rem",
+                            background: `${roleColor}15`,
+                            color: roleColor,
+                            borderRadius: 99,
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
                           }}
-                        />
-                        {u.roleName}
-                      </span>
-                    </td>
-                    <td>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "0.25rem",
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        <button
-                          onClick={() => openEdit(u)}
-                          title="Edit"
-                          style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            color: "var(--text-muted)",
-                            padding: "0.35rem",
-                            borderRadius: 6,
-                            display: "flex",
-                            transition: "color 0.15s",
-                          }}
-                          onMouseEnter={(e) =>
-                            ((e.currentTarget as HTMLButtonElement).style.color =
-                              "#fff")
-                          }
-                          onMouseLeave={(e) =>
-                            ((e.currentTarget as HTMLButtonElement).style.color =
-                              "var(--text-muted)")
-                          }
                         >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(u)}
-                          title="Delete"
+                          <span
+                            style={{
+                              width: 5,
+                              height: 5,
+                              borderRadius: "50%",
+                              background: roleColor,
+                            }}
+                          />
+                          {u.roleName}
+                        </span>
+                      </td>
+                      <td>
+                        <div
                           style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            color: "var(--text-muted)",
-                            padding: "0.35rem",
-                            borderRadius: 6,
                             display: "flex",
-                            transition: "color 0.15s",
+                            gap: "0.25rem",
+                            justifyContent: "flex-end",
                           }}
-                          onMouseEnter={(e) =>
-                            ((e.currentTarget as HTMLButtonElement).style.color =
-                              "#ef4444")
-                          }
-                          onMouseLeave={(e) =>
-                            ((e.currentTarget as HTMLButtonElement).style.color =
-                              "var(--text-muted)")
-                          }
                         >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          <button
+                            onClick={() => openEdit(u)}
+                            title="Edit"
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: "var(--text-muted)",
+                              padding: "0.35rem",
+                              borderRadius: 6,
+                              display: "flex",
+                              transition: "color 0.15s",
+                            }}
+                            onMouseEnter={(e) =>
+                              ((
+                                e.currentTarget as HTMLButtonElement
+                              ).style.color = "#fff")
+                            }
+                            onMouseLeave={(e) =>
+                              ((
+                                e.currentTarget as HTMLButtonElement
+                              ).style.color = "var(--text-muted)")
+                            }
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(u)}
+                            title="Delete"
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: "var(--text-muted)",
+                              padding: "0.35rem",
+                              borderRadius: 6,
+                              display: "flex",
+                              transition: "color 0.15s",
+                            }}
+                            onMouseEnter={(e) =>
+                              ((
+                                e.currentTarget as HTMLButtonElement
+                              ).style.color = "#ef4444")
+                            }
+                            onMouseLeave={(e) =>
+                              ((
+                                e.currentTarget as HTMLButtonElement
+                              ).style.color = "var(--text-muted)")
+                            }
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </GlassPanel>
@@ -388,9 +402,7 @@ export const Users: React.FC = () => {
               <InputField
                 placeholder="e.g. John Doe"
                 value={form.fullName}
-                onChange={(e) =>
-                  setForm({ ...form, fullName: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
               />
             </FormField>
             <FormField label="Email *">
@@ -398,9 +410,7 @@ export const Users: React.FC = () => {
                 type="email"
                 placeholder="e.g. john@example.com"
                 value={form.email}
-                onChange={(e) =>
-                  setForm({ ...form, email: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </FormField>
             {!editTarget && (
@@ -419,9 +429,7 @@ export const Users: React.FC = () => {
               <select
                 className="input-field"
                 value={form.roleId}
-                onChange={(e) =>
-                  setForm({ ...form, roleId: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, roleId: e.target.value })}
               >
                 <option value="">Select a role…</option>
                 {roles.map((r) => (
@@ -441,10 +449,7 @@ export const Users: React.FC = () => {
                 borderTop: "1px solid var(--glass-border)",
               }}
             >
-              <Button
-                variant="secondary"
-                onClick={() => setShowForm(false)}
-              >
+              <Button variant="secondary" onClick={() => setShowForm(false)}>
                 Cancel
               </Button>
               <Button onClick={handleSave}>

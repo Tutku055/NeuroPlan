@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  RefreshCw,
-  Shield,
-} from "lucide-react";
+import { Plus, Pencil, Trash2, RefreshCw, Shield } from "lucide-react";
 import { GlassPanel } from "../components/UI/GlassPanel";
 import { Button } from "../components/UI/Button";
 import { Modal } from "../components/UI/Modal";
@@ -16,17 +10,22 @@ import { api } from "../api/client";
 interface RoleItem {
   id: string;
   name: string;
+  color?: string;
   permissionIds: string[];
 }
 
 interface PermissionItem {
   id: string;
   systemName: string;
+  label?: string;
   description: string;
 }
 
+const DEFAULT_ROLE_COLOR = "#64748B";
+
 const EMPTY_FORM = {
   name: "",
+  color: DEFAULT_ROLE_COLOR,
   permissionIds: [] as string[],
 };
 
@@ -82,7 +81,7 @@ export const Roles: React.FC = () => {
 
   const openCreate = () => {
     setEditTarget(null);
-    setForm({ ...EMPTY_FORM, permissionIds: [] });
+    setForm({ ...EMPTY_FORM, color: DEFAULT_ROLE_COLOR, permissionIds: [] });
     setFormError("");
     setShowForm(true);
   };
@@ -91,6 +90,7 @@ export const Roles: React.FC = () => {
     setEditTarget(r);
     setForm({
       name: r.name,
+      color: normalizeHexColor(r.color || DEFAULT_ROLE_COLOR),
       permissionIds: [...r.permissionIds],
     });
     setFormError("");
@@ -108,6 +108,16 @@ export const Roles: React.FC = () => {
       toast("success", "Role deleted", `"${r.name}" was removed.`);
       fetchData();
     } catch (e: any) {
+      if (e.response?.status === 409) {
+        toast(
+          "warning",
+          "Role is in use",
+          e.response?.data?.message ||
+            "Reassign active users before deleting this role.",
+        );
+        return;
+      }
+
       toast(
         "error",
         "Delete failed",
@@ -134,18 +144,27 @@ export const Roles: React.FC = () => {
       return;
     }
 
+    if (!isValidHexColor(form.color)) {
+      setFormError("Color must be a valid hex code like #3B82F6.");
+      return;
+    }
+
+    const normalizedColor = normalizeHexColor(form.color);
+
     setSaving(true);
     setFormError("");
     try {
       if (editTarget) {
         await api.put(`/roles/${editTarget.id}`, {
           name: form.name,
+          color: normalizedColor,
           permissionIds: form.permissionIds,
         });
         toast("success", "Role updated", `"${form.name}" was saved.`);
       } else {
         await api.post("/roles", {
           name: form.name,
+          color: normalizedColor,
           permissionIds: form.permissionIds,
         });
         toast(
@@ -164,8 +183,18 @@ export const Roles: React.FC = () => {
 
   const getPermissionName = (id: string) => {
     const p = permissions.find((p) => p.id === id);
-    return p?.systemName || id;
+    return p?.label || p?.description || p?.systemName || id;
   };
+
+  const normalizeHexColor = (value: string) => value.trim().toUpperCase();
+
+  const isValidHexColor = (value: string) =>
+    /^#[0-9A-F]{6}$/.test(normalizeHexColor(value));
+
+  const roleColorValue = (color?: string) =>
+    isValidHexColor(color || "")
+      ? normalizeHexColor(color || "")
+      : DEFAULT_ROLE_COLOR;
 
   return (
     <div
@@ -188,10 +217,7 @@ export const Roles: React.FC = () => {
             variant="secondary"
             onClick={fetchData}
             icon={
-              <RefreshCw
-                size={15}
-                className={loading ? "animate-spin" : ""}
-              />
+              <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
             }
           >
             Refresh
@@ -247,117 +273,149 @@ export const Roles: React.FC = () => {
               <thead>
                 <tr>
                   <th>Role Name</th>
+                  <th>Color</th>
                   <th>Permissions</th>
                   <th style={{ width: 100, textAlign: "right" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {roles.map((r) => (
-                  <tr key={r.id}>
-                    <td>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                        }}
-                      >
-                        <Shield
-                          size={14}
-                          color="var(--accent-primary)"
-                        />
-                        <span style={{ fontWeight: 500 }}>{r.name}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "0.3rem",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        {r.permissionIds.length === 0 && (
+                {roles.map((r) => {
+                  const currentColor = roleColorValue(r.color);
+                  return (
+                    <tr key={r.id}>
+                      <td>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                          }}
+                        >
+                          <Shield size={14} color={currentColor} />
+                          <span style={{ fontWeight: 500 }}>{r.name}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.45rem",
+                            fontSize: "0.76rem",
+                            color: "var(--text-secondary)",
+                          }}
+                        >
                           <span
                             style={{
-                              color: "var(--text-muted)",
-                              fontSize: "0.78rem",
+                              width: 12,
+                              height: 12,
+                              borderRadius: "50%",
+                              background: currentColor,
+                              border: "1px solid rgba(255,255,255,0.25)",
+                              display: "inline-block",
                             }}
-                          >
-                            No permissions
-                          </span>
-                        )}
-                        {r.permissionIds.map((pid) => (
-                          <span
-                            key={pid}
-                            className="tag"
-                            style={{ fontSize: "0.7rem" }}
-                          >
-                            {getPermissionName(pid)}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "0.25rem",
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        <button
-                          onClick={() => openEdit(r)}
-                          title="Edit"
+                          />
+                          {currentColor}
+                        </div>
+                      </td>
+                      <td>
+                        <div
                           style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            color: "var(--text-muted)",
-                            padding: "0.35rem",
-                            borderRadius: 6,
                             display: "flex",
-                            transition: "color 0.15s",
+                            gap: "0.3rem",
+                            flexWrap: "wrap",
                           }}
-                          onMouseEnter={(e) =>
-                            ((e.currentTarget as HTMLButtonElement).style.color =
-                              "#fff")
-                          }
-                          onMouseLeave={(e) =>
-                            ((e.currentTarget as HTMLButtonElement).style.color =
-                              "var(--text-muted)")
-                          }
                         >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(r)}
-                          title="Delete"
+                          {r.permissionIds.length === 0 && (
+                            <span
+                              style={{
+                                color: "var(--text-muted)",
+                                fontSize: "0.78rem",
+                              }}
+                            >
+                              No permissions
+                            </span>
+                          )}
+                          {r.permissionIds.map((pid) => (
+                            <span
+                              key={pid}
+                              className="tag"
+                              style={{ fontSize: "0.7rem" }}
+                              title={
+                                permissions.find((p) => p.id === pid)
+                                  ?.systemName || pid
+                              }
+                            >
+                              {getPermissionName(pid)}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td>
+                        <div
                           style={{
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            color: "var(--text-muted)",
-                            padding: "0.35rem",
-                            borderRadius: 6,
                             display: "flex",
-                            transition: "color 0.15s",
+                            gap: "0.25rem",
+                            justifyContent: "flex-end",
                           }}
-                          onMouseEnter={(e) =>
-                            ((e.currentTarget as HTMLButtonElement).style.color =
-                              "#ef4444")
-                          }
-                          onMouseLeave={(e) =>
-                            ((e.currentTarget as HTMLButtonElement).style.color =
-                              "var(--text-muted)")
-                          }
                         >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          <button
+                            onClick={() => openEdit(r)}
+                            title="Edit"
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: "var(--text-muted)",
+                              padding: "0.35rem",
+                              borderRadius: 6,
+                              display: "flex",
+                              transition: "color 0.15s",
+                            }}
+                            onMouseEnter={(e) =>
+                              ((
+                                e.currentTarget as HTMLButtonElement
+                              ).style.color = "#fff")
+                            }
+                            onMouseLeave={(e) =>
+                              ((
+                                e.currentTarget as HTMLButtonElement
+                              ).style.color = "var(--text-muted)")
+                            }
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(r)}
+                            title="Delete"
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              color: "var(--text-muted)",
+                              padding: "0.35rem",
+                              borderRadius: 6,
+                              display: "flex",
+                              transition: "color 0.15s",
+                            }}
+                            onMouseEnter={(e) =>
+                              ((
+                                e.currentTarget as HTMLButtonElement
+                              ).style.color = "#ef4444")
+                            }
+                            onMouseLeave={(e) =>
+                              ((
+                                e.currentTarget as HTMLButtonElement
+                              ).style.color = "var(--text-muted)")
+                            }
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </GlassPanel>
@@ -390,10 +448,47 @@ export const Roles: React.FC = () => {
               <InputField
                 placeholder="e.g. Supervisor"
                 value={form.name}
-                onChange={(e) =>
-                  setForm({ ...form, name: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
+            </FormField>
+            <FormField label="Role Color *">
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.65rem",
+                  alignItems: "center",
+                }}
+              >
+                <input
+                  type="color"
+                  value={roleColorValue(form.color)}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      color: normalizeHexColor(e.target.value),
+                    })
+                  }
+                  style={{
+                    width: 40,
+                    height: 34,
+                    border: "1px solid var(--glass-border)",
+                    borderRadius: 8,
+                    background: "transparent",
+                    padding: 2,
+                    cursor: "pointer",
+                  }}
+                />
+                <InputField
+                  placeholder="#64748B"
+                  value={form.color}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      color: normalizeHexColor(e.target.value),
+                    })
+                  }
+                />
+              </div>
             </FormField>
             <FormField label="Permissions">
               <div
@@ -417,7 +512,9 @@ export const Roles: React.FC = () => {
                       onChange={() => togglePermission(p.id)}
                     />
                     <div>
-                      <div style={{ fontWeight: 500 }}>{p.systemName}</div>
+                      <div style={{ fontWeight: 500 }}>
+                        {p.label || p.description || p.systemName}
+                      </div>
                       {p.description && (
                         <div
                           style={{
@@ -426,7 +523,7 @@ export const Roles: React.FC = () => {
                             marginTop: "0.1rem",
                           }}
                         >
-                          {p.description}
+                          {p.systemName}
                         </div>
                       )}
                     </div>
@@ -455,10 +552,7 @@ export const Roles: React.FC = () => {
                 borderTop: "1px solid var(--glass-border)",
               }}
             >
-              <Button
-                variant="secondary"
-                onClick={() => setShowForm(false)}
-              >
+              <Button variant="secondary" onClick={() => setShowForm(false)}>
                 Cancel
               </Button>
               <Button onClick={handleSave}>

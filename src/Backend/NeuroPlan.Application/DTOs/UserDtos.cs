@@ -9,6 +9,7 @@ public class UserResponseDto
     public string Email { get; set; } = string.Empty;
     public Guid RoleId { get; set; }
     public string RoleName { get; set; } = string.Empty;
+    public string RoleColor { get; set; } = string.Empty;
 }
 
 public class CreateUserRequestDto
@@ -23,5 +24,6 @@ public class UpdateUserRequestDto
 {
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string? Password { get; set; }
     public Guid RoleId { get; set; }
 }

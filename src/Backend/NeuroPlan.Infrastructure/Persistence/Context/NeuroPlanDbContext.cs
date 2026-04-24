@@ -35,6 +35,26 @@ public class NeuroPlanDbContext : DbContext
             .WithMany(p => p.RolePermissions)
             .HasForeignKey(rp => rp.PermissionId);
 
+        modelBuilder.Entity<Role>()
+            .Property(role => role.Color)
+            .HasMaxLength(7)
+            .HasDefaultValue("#64748B");
+
+        modelBuilder.Entity<User>()
+            .HasOne(user => user.Role)
+            .WithMany(role => role.Users)
+            .HasForeignKey(user => user.RoleId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Worklog>()
+            .HasOne(worklog => worklog.User)
+            .WithMany(user => user.Worklogs)
+            .HasForeignKey(worklog => worklog.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<RolePermission>()
+            .HasQueryFilter(rp => !rp.Role.IsDeleted && !rp.Permission.IsDeleted);
+
         // Apply Soft Delete Global Query Filters
         modelBuilder.Entity<User>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<Role>().HasQueryFilter(e => !e.IsDeleted);

@@ -33,7 +33,7 @@ export const Login: React.FC = () => {
     } catch (err: any) {
       setError(
         err.response?.data?.message ||
-          "Authentication failed. Try: admin, manager, or worker.",
+          "Authentication failed. Try admin/manager/worker, or use your account email.",
       );
     } finally {
       setLoading(false);
@@ -278,7 +278,7 @@ export const Login: React.FC = () => {
                   marginBottom: "0.4rem",
                 }}
               >
-                Username
+                Username or Email
               </label>
               <div style={{ position: "relative" }}>
                 <div
@@ -298,7 +298,7 @@ export const Login: React.FC = () => {
                 <input
                   className="input-field"
                   type="text"
-                  placeholder="e.g. admin"
+                  placeholder="e.g. admin or user@example.com"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   autoComplete="username"
@@ -404,10 +404,11 @@ export const Login: React.FC = () => {
               lineHeight: 1.7,
             }}
           >
-            Demo credentials:{" "}
-            <span style={{ color: "var(--text-secondary)" }}>admin</span> /{" "}
-            <span style={{ color: "var(--text-secondary)" }}>manager</span> /{" "}
-            <span style={{ color: "var(--text-secondary)" }}>worker</span>
+            Demo aliases:{" "}
+            <span style={{ color: "var(--text-secondary)" }}>admin</span>,{" "}
+            <span style={{ color: "var(--text-secondary)" }}>manager</span>,{" "}
+            <span style={{ color: "var(--text-secondary)" }}>worker</span>.
+            Created users can sign in with email + password.
           </p>
         </div>
       </div>

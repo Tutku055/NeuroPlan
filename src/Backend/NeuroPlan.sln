@@ -8,15 +8,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{2B2B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{3C3C3C3C-3C3C-3C3C-3C3C-3C3C3C3C3C3C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Domain", "src\Backend\NeuroPlan.Domain\NeuroPlan.Domain.csproj", "{4D4D4D4D-4D4D-4D4D-4D4D-4D4D4D4D4D4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Domain", "NeuroPlan.Domain\NeuroPlan.Domain.csproj", "{4D4D4D4D-4D4D-4D4D-4D4D-4D4D4D4D4D4D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Application", "src\Backend\NeuroPlan.Application\NeuroPlan.Application.csproj", "{5E5E5E5E-5E5E-5E5E-5E5E-5E5E5E5E5E5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Application", "NeuroPlan.Application\NeuroPlan.Application.csproj", "{5E5E5E5E-5E5E-5E5E-5E5E-5E5E5E5E5E5E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Infrastructure", "src\Backend\NeuroPlan.Infrastructure\NeuroPlan.Infrastructure.csproj", "{6F6F6F6F-6F6F-6F6F-6F6F-6F6F6F6F6F6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Infrastructure", "NeuroPlan.Infrastructure\NeuroPlan.Infrastructure.csproj", "{6F6F6F6F-6F6F-6F6F-6F6F-6F6F6F6F6F6F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.API", "src\Backend\NeuroPlan.API\NeuroPlan.API.csproj", "{7A7A7A7A-7A7A-7A7A-7A7A-7A7A7A7A7A7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.API", "NeuroPlan.API\NeuroPlan.API.csproj", "{7A7A7A7A-7A7A-7A7A-7A7A-7A7A7A7A7A7A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Tests", "src\Backend\NeuroPlan.Tests\NeuroPlan.Tests.csproj", "{8B8B8B8B-8B8B-8B8B-8B8B-8B8B8B8B8B8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuroPlan.Tests", "NeuroPlan.Tests\NeuroPlan.Tests.csproj", "{8B8B8B8B-8B8B-8B8B-8B8B-8B8B8B8B8B8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
