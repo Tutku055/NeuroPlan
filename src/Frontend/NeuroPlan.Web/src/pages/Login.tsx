@@ -161,7 +161,7 @@ export const Login: React.FC = () => {
           >
             {[
               { label: "AI Forecasting", color: "#7c3aed" },
-              { label: "QR Tracking", color: "#0ea5e9" },
+              { label: "Real-time Metrics", color: "#0ea5e9" },
               { label: "Role-Based", color: "#10b981" },
             ].map((f) => (
               <div

@@ -18,31 +18,39 @@ public class AiPredictionProvider : IAiPredictionProvider
 
     public async Task<DateTime> PredictCompletionDateAsync(DateTime startDate, double velocity, int remainingComplexity)
     {
-        var payload = new
-        {
-            start_date = startDate.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-            velocity = velocity,
-            remaining_complexity = remainingComplexity
-        };
-
-        // This will post to /predict on the BaseAddress configured via HttpClient in DependencyInjection
-        var response = await _httpClient.PostAsJsonAsync("predict", payload);
-
-        response.EnsureSuccessStatusCode();
-
-        var resultText = await response.Content.ReadAsStringAsync();
-
         try
         {
-            var jsonDoc = JsonDocument.Parse(resultText);
-            var dateString = jsonDoc.RootElement.GetProperty("predicted_date").GetString();
-            return DateTime.Parse(dateString!);
+            var payload = new
+            {
+                start_date = startDate.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                velocity = velocity,
+                remaining_complexity = remainingComplexity
+            };
+
+            // This will post to /predict on the BaseAddress configured via HttpClient in DependencyInjection
+            var response = await _httpClient.PostAsJsonAsync("predict", payload);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var resultText = await response.Content.ReadAsStringAsync();
+                var jsonDoc = JsonDocument.Parse(resultText);
+                var dateString = jsonDoc.RootElement.GetProperty("predicted_date").GetString();
+                
+                if (DateTime.TryParse(dateString, out var predictedDate))
+                {
+                    return predictedDate;
+                }
+            }
+            
+            Console.WriteLine($"[AiPredictionProvider] AI Service call failed or returned invalid date. Status: {response.StatusCode}. Falling back to simplistic calculation.");
         }
-        catch
+        catch (Exception ex)
         {
-            // Fallback simplistic calculation if the AI payload parse fails or isn't completely hooked up yet
-            int daysNeeded = (int)Math.Ceiling(remainingComplexity / velocity);
-            return DateTime.UtcNow.AddDays(daysNeeded);
+            Console.WriteLine($"[AiPredictionProvider] Exception during AI Service call: {ex.Message}. Falling back to simplistic calculation.");
         }
+
+        // Fallback simplistic calculation if the AI payload parse fails or service is unreachable
+        int daysNeeded = (int)Math.Ceiling(remainingComplexity / (velocity > 0 ? velocity : 1.0));
+        return DateTime.UtcNow.AddDays(daysNeeded);
     }
 }

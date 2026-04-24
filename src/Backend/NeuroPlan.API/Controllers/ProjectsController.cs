@@ -5,7 +5,7 @@ using NeuroPlan.Application.DTOs;
 using NeuroPlan.Application.Interfaces;
 using NeuroPlan.Domain.Entities;
 using NeuroPlan.Domain.Interfaces;
-using QRCoder;
+
 
 namespace NeuroPlan.API.Controllers;
 
@@ -108,21 +108,7 @@ public class ProjectsController : ControllerBase
         }
     }
 
-    [HttpGet("{projectCode}/qr")]
-    [Authorize(Policy = AuthorizationPolicies.ProjectsRead)]
-    public IActionResult GetProjectQrCode(string projectCode)
-    {
-        if (string.IsNullOrWhiteSpace(projectCode)) return BadRequest();
 
-        var url = $"http://localhost:5173/worklogs?projectCode={projectCode}";
-
-        using QRCodeGenerator qrGenerator = new QRCodeGenerator();
-        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
-        using PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
-        byte[] qrCodeImage = qrCode.GetGraphic(20);
-
-        return File(qrCodeImage, "image/png");
-    }
 
     private static ProjectResponseDto MapToDto(Project project)
     {
