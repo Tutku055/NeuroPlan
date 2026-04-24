@@ -11,6 +11,9 @@ import { Login } from "./pages/Login";
 import { Projects } from "./pages/Projects";
 import { Tasks } from "./pages/Tasks";
 import { Worklogs } from "./pages/Worklogs";
+import { Performance } from "./pages/Performance";
+import { Users } from "./pages/Users";
+import { Roles } from "./pages/Roles";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
@@ -53,6 +56,9 @@ function App() {
               <Route path="projects" element={<Projects />} />
               <Route path="projects/:projectId/tasks" element={<Tasks />} />
               <Route path="worklogs" element={<Worklogs />} />
+              <Route path="performance" element={<Performance />} />
+              <Route path="users" element={<Users />} />
+              <Route path="roles" element={<Roles />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

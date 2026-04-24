@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NeuroPlan.Domain.Entities;
@@ -18,4 +19,14 @@ public class WorklogRepository : GenericRepository<Worklog>, IWorklogRepository
         return await _dbSet
             .FirstOrDefaultAsync(w => w.UserId == userId && w.EndTime == null);
     }
+
+    public async Task<IEnumerable<Worklog>> GetAllWithDetailsAsync()
+    {
+        return await _dbSet
+            .Include(w => w.TaskItem)
+                .ThenInclude(t => t.Project)
+            .Include(w => w.User)
+            .ToListAsync();
+    }
 }
+

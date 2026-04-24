@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { LayoutDashboard, LogOut, Target, User, Zap, Activity } from "lucide-react";
+import { LayoutDashboard, LogOut, Target, User, Zap, Activity, BarChart3, Users, Shield } from "lucide-react";
 
 export const DashboardLayout: React.FC = () => {
   const { role, permissions, logout } = useAuth();
@@ -38,6 +38,33 @@ export const DashboardLayout: React.FC = () => {
     });
   }
 
+  if (
+    permissions.includes("ViewStatistics") ||
+    permissions.includes("ManageProjects")
+  ) {
+    menuItems.push({
+      name: "Performance",
+      path: "/performance",
+      icon: <BarChart3 size={18} />,
+    });
+  }
+
+  if (permissions.includes("ManageUsers") || role === "Admin") {
+    menuItems.push({
+      name: "Users",
+      path: "/users",
+      icon: <Users size={18} />,
+    });
+  }
+
+  if (permissions.includes("ManageRoles") || role === "Admin") {
+    menuItems.push({
+      name: "Roles",
+      path: "/roles",
+      icon: <Shield size={18} />,
+    });
+  }
+
   const isActive = (path: string) => location.pathname.startsWith(path);
 
   const roleColor =
@@ -45,9 +72,7 @@ export const DashboardLayout: React.FC = () => {
 
   return (
     <div className="app-shell">
-      {/* ── Sidebar ── */}
       <aside className="sidebar no-print">
-        {/* Brand */}
         <div
           style={{
             padding: "0.5rem 0.5rem 1.5rem",
@@ -126,7 +151,6 @@ export const DashboardLayout: React.FC = () => {
           </div>
         </div>
 
-        {/* Divider */}
         <div className="divider" />
         <p
           style={{
@@ -141,7 +165,6 @@ export const DashboardLayout: React.FC = () => {
           Navigation
         </p>
 
-        {/* Nav */}
         <nav
           style={{
             display: "flex",
@@ -172,7 +195,6 @@ export const DashboardLayout: React.FC = () => {
           ))}
         </nav>
 
-        {/* Logout */}
         <div className="divider" />
         <button
           onClick={handleLogout}
@@ -209,7 +231,6 @@ export const DashboardLayout: React.FC = () => {
           Sign Out
         </button>
 
-        {/* Footer Version */}
         <p
           style={{
             fontSize: "0.65rem",
@@ -223,7 +244,6 @@ export const DashboardLayout: React.FC = () => {
         </p>
       </aside>
 
-      {/* ── Main ── */}
       <main className="main-content">
         <div className="animate-fade-y" style={{ flex: 1 }}>
           <Outlet />

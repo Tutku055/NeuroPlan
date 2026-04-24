@@ -8,4 +8,7 @@ public static class AuthorizationPolicies
     public const string TasksRead = "TasksRead";
     public const string TasksManage = "TasksManage";
     public const string WorklogsTrack = "WorklogsTrack";
+    public const string PerformanceRead = "PerformanceRead";
+    public const string UsersManage = "UsersManage";
+    public const string RolesManage = "RolesManage";
 }

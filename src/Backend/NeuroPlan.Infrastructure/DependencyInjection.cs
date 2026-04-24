@@ -14,20 +14,20 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // Add SQLite DbContext Setup
         services.AddDbContext<NeuroPlanDbContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("DefaultConnection"),
             b => b.MigrationsAssembly(typeof(NeuroPlanDbContext).Assembly.FullName)));
 
-        // Register Repositories
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<ITaskItemRepository, TaskItemRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<IWorklogRepository, WorklogRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IPermissionRepository, PermissionRepository>();
 
 
 
-        // Register AI Prediction Provider HttpClient pointing to Python FastAPI
         services.AddHttpClient<IAiPredictionProvider, AiPredictionProvider>(client =>
         {
             var baseUrl = configuration["AiSettings:BaseUrl"] ?? "http://localhost:8000/";

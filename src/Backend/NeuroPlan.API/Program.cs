@@ -81,6 +81,25 @@ builder.Services.AddAuthorization(options =>
                   context.User,
                   Permissions.TrackWork,
                   Permissions.ManageTaskItems)));
+
+    options.AddPolicy(AuthorizationPolicies.PerformanceRead, policy =>
+        policy.RequireAuthenticatedUser()
+              .RequireAssertion(context => HasAnyPermission(
+                  context.User,
+                  Permissions.ViewStatistics,
+                  Permissions.ManageProjects)));
+
+    options.AddPolicy(AuthorizationPolicies.UsersManage, policy =>
+        policy.RequireAuthenticatedUser()
+              .RequireAssertion(context => HasAnyPermission(
+                  context.User,
+                  Permissions.ManageUsers)));
+
+    options.AddPolicy(AuthorizationPolicies.RolesManage, policy =>
+        policy.RequireAuthenticatedUser()
+              .RequireAssertion(context => HasAnyPermission(
+                  context.User,
+                  Permissions.ManageRoles)));
 });
 
 builder.Services.AddCors(options =>
@@ -174,6 +193,8 @@ static void SeedAuthorizationData(NeuroPlanDbContext db)
     var createProjectPermissionId = Guid.Parse("20000000-0000-0000-0000-000000000005");
     var viewStatisticsPermissionId = Guid.Parse("20000000-0000-0000-0000-000000000006");
     var readProjectsPermissionId = Guid.Parse("20000000-0000-0000-0000-000000000007");
+    var manageUsersPermissionId = Guid.Parse("20000000-0000-0000-0000-000000000008");
+    var manageRolesPermissionId = Guid.Parse("20000000-0000-0000-0000-000000000009");
 
     UpsertRole(db, adminRoleId, "Admin");
     UpsertRole(db, workerRoleId, "Worker");
@@ -186,10 +207,11 @@ static void SeedAuthorizationData(NeuroPlanDbContext db)
     UpsertPermission(db, createProjectPermissionId, Permissions.CreateProject, "Allows creating and editing projects.");
     UpsertPermission(db, viewStatisticsPermissionId, Permissions.ViewStatistics, "Allows reading project summary and statistics data.");
     UpsertPermission(db, readProjectsPermissionId, Permissions.ReadProjects, "Allows reading project and task listings.");
+    UpsertPermission(db, manageUsersPermissionId, Permissions.ManageUsers, "Allows managing system users.");
+    UpsertPermission(db, manageRolesPermissionId, Permissions.ManageRoles, "Allows managing system roles and permissions.");
 
     var expectedRolePermissions = new HashSet<(Guid RoleId, Guid PermissionId)>
     {
-        // Admin permissions (full access)
         (adminRoleId, manageProjectsPermissionId),
         (adminRoleId, assessRiskPermissionId),
         (adminRoleId, manageTaskItemsPermissionId),
@@ -197,17 +219,19 @@ static void SeedAuthorizationData(NeuroPlanDbContext db)
         (adminRoleId, createProjectPermissionId),
         (adminRoleId, viewStatisticsPermissionId),
         (adminRoleId, readProjectsPermissionId),
+        (adminRoleId, manageUsersPermissionId),
+        (adminRoleId, manageRolesPermissionId),
 
-        // Worker permissions
         (workerRoleId, trackWorkPermissionId),
         (workerRoleId, readProjectsPermissionId),
 
-        // Manager permissions
         (managerRoleId, createProjectPermissionId),
         (managerRoleId, viewStatisticsPermissionId),
         (managerRoleId, readProjectsPermissionId),
         (managerRoleId, manageTaskItemsPermissionId),
-        (managerRoleId, assessRiskPermissionId)
+        (managerRoleId, assessRiskPermissionId),
+        (managerRoleId, manageUsersPermissionId),
+        (managerRoleId, manageRolesPermissionId)
     };
 
     var managedRoleIds = new HashSet<Guid> { adminRoleId, workerRoleId, managerRoleId };
