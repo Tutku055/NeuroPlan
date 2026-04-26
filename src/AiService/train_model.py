@@ -1,26 +1,28 @@
 import random
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
 import joblib
 
-# 1. Generate Synthetic Data
-# We create fake data so the model can learn the relationship: Complexity / Velocity = Days
-X = [] # Inputs: [velocity, remaining_complexity]
-y = [] # Target/Output: [days_needed]
+# 1. Generate Data
+X = [] # [velocity, remaining_complexity]
+y = [] # [days_needed]
 
-for _ in range(1000):
-    velocity = random.uniform(1.0, 100.0)
+for _ in range(2000):
+    # Velocity: Tasks done per day (1 to 20)
+    velocity = random.uniform(1.0, 20.0) 
+    
+    # Complexity: 1 to 10 scale
     complexity = random.randint(1, 10)
     
-    # The actual result we want the model to predict
+    # Target: Non-linear relationship
     days_needed = complexity / velocity
     
     X.append([velocity, complexity])
     y.append(days_needed)
 
-# 2. Train the Model (Linear Regression)
-model = LinearRegression()
+# 2. Train Model
+model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(X, y)
 
-# 3. Save the Trained Model to Disk
+# 3. Save Model
 joblib.dump(model, 'neuroplan_model.joblib')
-print("SUCCESS: Model trained and saved as 'neuroplan_model.joblib'!")
+print("SUCCESS: Model trained and saved!")
