@@ -28,20 +28,20 @@ public class AiPredictionProvider : IAiPredictionProvider
             };
 
             // This will post to /predict on the BaseAddress configured via HttpClient in DependencyInjection
-            var response = await _httpClient.PostAsJsonAsync("predict", payload);
-            
+            var response = await _httpClient.PostAsJsonAsync("http://127.0.0.1:8000/predict", payload);
+
             if (response.IsSuccessStatusCode)
             {
                 var resultText = await response.Content.ReadAsStringAsync();
                 var jsonDoc = JsonDocument.Parse(resultText);
                 var dateString = jsonDoc.RootElement.GetProperty("predicted_date").GetString();
-                
+
                 if (DateTime.TryParse(dateString, out var predictedDate))
                 {
                     return predictedDate;
                 }
             }
-            
+
             Console.WriteLine($"[AiPredictionProvider] AI Service call failed or returned invalid date. Status: {response.StatusCode}. Falling back to simplistic calculation.");
         }
         catch (Exception ex)

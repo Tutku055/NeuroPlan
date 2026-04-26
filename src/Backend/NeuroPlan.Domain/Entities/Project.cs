@@ -13,4 +13,12 @@ public class Project : BaseEntity
 
     // Navigation properties
     public ICollection<TaskItem> TaskItems { get; set; } = new List<TaskItem>();
+
+    public void UpdateDetails(string name, string projectCode, string description, DateTime? targetEndDate)
+    {
+        Name = name;
+        ProjectCode = projectCode;
+        Description = description;
+        TargetEndDate = targetEndDate;
+    }
 }

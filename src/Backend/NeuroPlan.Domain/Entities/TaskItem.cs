@@ -18,4 +18,28 @@ public class TaskItem : BaseEntity
 
     // Navigation properties
     public ICollection<Worklog> Worklogs { get; set; } = new List<Worklog>();
+
+    public void UpdateDetails(string title, string description, int complexityScore, string taskCode)
+    {
+        Title = title;
+        Description = description;
+        ComplexityScore = complexityScore;
+        TaskCode = taskCode;
+    }
+
+    public void ChangeStatus(EntityStatus status)
+    {
+        Status = status;
+    }
+
+    public void MarkCompleted(DateTime completedAt)
+    {
+        Status = EntityStatus.Completed;
+        CompletedDate = completedAt;
+    }
+
+    public void MarkCancelled()
+    {
+        Status = EntityStatus.Cancelled;
+    }
 }

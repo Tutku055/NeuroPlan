@@ -14,4 +14,11 @@ public class User : BaseEntity
 
     // Navigation properties
     public ICollection<Worklog> Worklogs { get; set; } = new List<Worklog>();
+
+    public void UpdateProfile(string fullName, string email, Guid roleId)
+    {
+        FullName = fullName;
+        Email = email;
+        RoleId = roleId;
+    }
 }

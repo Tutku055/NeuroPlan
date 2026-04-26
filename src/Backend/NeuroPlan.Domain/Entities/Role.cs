@@ -10,4 +10,10 @@ public class Role : BaseEntity
     // Navigation properties
     public ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
     public ICollection<User> Users { get; set; } = new List<User>();
+
+    public void UpdateDetails(string name, string color)
+    {
+        Name = name;
+        Color = color;
+    }
 }

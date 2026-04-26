@@ -3,14 +3,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NeuroPlan.Application.DTOs;
-using NeuroPlan.Domain.Entities;
-using NeuroPlan.Infrastructure.Persistence.Context;
+using NeuroPlan.Application.Interfaces;
 
 namespace NeuroPlan.API.Controllers;
 
@@ -18,74 +15,28 @@ namespace NeuroPlan.API.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private static readonly IReadOnlyDictionary<string, string> SeededUserAliases = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-    {
-        ["admin"] = "admin@example.com",
-        ["worker"] = "worker@example.com",
-        ["manager"] = "manager@example.com"
-    };
-
     private readonly IConfiguration _configuration;
-    private readonly NeuroPlanDbContext _dbContext;
-    private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly IAuthService _authService;
 
     public AuthController(
         IConfiguration configuration,
-        NeuroPlanDbContext dbContext,
-        IPasswordHasher<User> passwordHasher)
+        IAuthService authService)
     {
         _configuration = configuration;
-        _dbContext = dbContext;
-        _passwordHasher = passwordHasher;
+        _authService = authService;
     }
 
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
-        var loginIdentifier = request.Username?.Trim();
-        var providedPassword = request.Password?.Trim();
-
-        if (string.IsNullOrWhiteSpace(loginIdentifier) || string.IsNullOrWhiteSpace(providedPassword))
+        var authenticatedUser = await _authService.AuthenticateAsync(request);
+        if (authenticatedUser is null)
         {
             return Unauthorized(new { Message = "Invalid credentials." });
         }
 
-        var loginEmail = ResolveLoginEmail(loginIdentifier);
-
-        var user = await _dbContext.Users
-            .Include(entity => entity.Role)
-            .ThenInclude(role => role.RolePermissions)
-            .ThenInclude(rolePermission => rolePermission.Permission)
-            .FirstOrDefaultAsync(entity => entity.Email == loginEmail);
-
-        if (user is null)
-        {
-            return Unauthorized(new { Message = "Invalid credentials." });
-        }
-
-        if (!TryVerifyPassword(user, providedPassword, out var shouldRehash))
-        {
-            return Unauthorized(new { Message = "Invalid credentials." });
-        }
-
-        if (shouldRehash)
-        {
-            user.PasswordHash = _passwordHasher.HashPassword(user, providedPassword);
-            await _dbContext.SaveChangesAsync();
-        }
-
-        if (user.Role is null)
-        {
-            return Unauthorized(new { Message = "Invalid credentials." });
-        }
-
-        var permissions = user.Role.RolePermissions
-            .Select(rolePermission => rolePermission.Permission.SystemName)
-            .Where(permission => !string.IsNullOrWhiteSpace(permission))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(permission => permission)
-            .ToArray();
+        var permissions = authenticatedUser.Permissions;
 
         var packedPermissions = string.Join(',', permissions);
 
@@ -99,9 +50,9 @@ public class AuthController : ControllerBase
         var key = Encoding.UTF8.GetBytes(keyParam);
         var claims = new List<Claim>
         {
-            new("Id", user.Id.ToString()),
-            new(JwtRegisteredClaimNames.Sub, user.Email),
-            new(ClaimTypes.Role, user.Role.Name),
+            new("Id", authenticatedUser.UserId.ToString()),
+            new(JwtRegisteredClaimNames.Sub, authenticatedUser.Email),
+            new(ClaimTypes.Role, authenticatedUser.Role),
             new("Permissions", packedPermissions)
         };
 
@@ -123,48 +74,8 @@ public class AuthController : ControllerBase
         return Ok(new LoginResponseDto
         {
             Token = jwtToken,
-            Role = user.Role.Name,
+            Role = authenticatedUser.Role,
             Permissions = permissions
         });
-    }
-
-    private bool TryVerifyPassword(User user, string providedPassword, out bool shouldRehash)
-    {
-        shouldRehash = false;
-
-        var verificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, providedPassword);
-
-        if (verificationResult == PasswordVerificationResult.Success)
-        {
-            return true;
-        }
-
-        if (verificationResult == PasswordVerificationResult.SuccessRehashNeeded)
-        {
-            shouldRehash = true;
-            return true;
-        }
-
-        // Backward compatibility for legacy plaintext-era records.
-        if (string.Equals(user.PasswordHash, providedPassword, StringComparison.Ordinal))
-        {
-            shouldRehash = true;
-            return true;
-        }
-
-        return false;
-    }
-
-    private static string ResolveLoginEmail(string usernameOrEmail)
-    {
-        var normalized = usernameOrEmail.Trim().ToLowerInvariant();
-        
-        // Only resolve aliases if it's not a full email address (doesn't contain '@')
-        if (!normalized.Contains('@') && SeededUserAliases.TryGetValue(normalized, out var seededEmail))
-        {
-            return seededEmail;
-        }
-        
-        return normalized;
     }
 }

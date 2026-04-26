@@ -7,6 +7,7 @@ using NeuroPlan.Domain.Interfaces;
 using NeuroPlan.Infrastructure.ExternalServices;
 using NeuroPlan.Infrastructure.Persistence.Context;
 using NeuroPlan.Infrastructure.Persistence.Repositories;
+using NeuroPlan.Infrastructure.Seeding;
 
 namespace NeuroPlan.Infrastructure;
 
@@ -25,6 +26,8 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPermissionRepository, PermissionRepository>();
+        services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+        services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
 
 
 

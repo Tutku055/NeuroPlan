@@ -1,11 +1,9 @@
 using System;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NeuroPlan.API.Settings;
 using NeuroPlan.Application.DTOs;
-using NeuroPlan.Domain.Entities;
-using NeuroPlan.Domain.Interfaces;
+using NeuroPlan.Application.Interfaces;
 
 namespace NeuroPlan.API.Controllers;
 
@@ -14,131 +12,71 @@ namespace NeuroPlan.API.Controllers;
 [Authorize(Policy = AuthorizationPolicies.UsersManage)]
 public class UsersController : ControllerBase
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IRoleRepository _roleRepository;
-    private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly IUserService _userService;
 
-    public UsersController(
-        IUserRepository userRepository,
-        IRoleRepository roleRepository,
-        IPasswordHasher<User> passwordHasher)
+    public UsersController(IUserService userService)
     {
-        _userRepository = userRepository;
-        _roleRepository = roleRepository;
-        _passwordHasher = passwordHasher;
+        _userService = userService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var users = await _userRepository.GetAllWithRolesAsync();
-        return Ok(users.Select(u => MapToDto(u)));
+        var users = await _userService.GetAllAsync();
+        return Ok(users);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var user = await _userRepository.GetByIdWithRoleAsync(id);
+        var user = await _userService.GetByIdAsync(id);
         if (user == null) return NotFound();
-        return Ok(MapToDto(user));
+        return Ok(user);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateUserRequestDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.FullName))
-            return BadRequest(new { message = "Full name is required." });
-
-        if (string.IsNullOrWhiteSpace(dto.Email))
-            return BadRequest(new { message = "Email is required." });
-
-        if (string.IsNullOrWhiteSpace(dto.Password))
-            return BadRequest(new { message = "Password is required for new users." });
-
-        var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
-
-        // Check for uniqueness
-        var existingWithEmail = await _userRepository.FindAsync(u => u.Email == normalizedEmail);
-        if (existingWithEmail.Any())
-            return BadRequest(new { message = "A user with this email already exists." });
-
-        var role = await _roleRepository.GetByIdAsync(dto.RoleId);
-        if (role == null)
-            return BadRequest(new { message = "Invalid role." });
-
-        var user = new User
+        try
         {
-            FullName = dto.FullName.Trim(),
-            Email = normalizedEmail,
-            RoleId = dto.RoleId
-        };
-
-        user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password.Trim());
-
-        await _userRepository.AddAsync(user);
-        return CreatedAtAction(nameof(GetById), new { id = user.Id }, MapToDto(user, role.Name, role.Color));
+            var user = await _userService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserRequestDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.FullName))
-            return BadRequest(new { message = "Full name is required." });
-
-        if (string.IsNullOrWhiteSpace(dto.Email))
-            return BadRequest(new { message = "Email is required." });
-
-        var existing = await _userRepository.GetByIdAsync(id);
-        if (existing == null) return NotFound();
-
-        var role = await _roleRepository.GetByIdAsync(dto.RoleId);
-        if (role == null)
-            return BadRequest(new { message = "Invalid role." });
-
-        var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
-
-        // Check for uniqueness if email changed
-        if (existing.Email != normalizedEmail)
+        try
         {
-            var otherWithEmail = await _userRepository.FindAsync(u => u.Email == normalizedEmail && u.Id != id);
-            if (otherWithEmail.Any())
-                return BadRequest(new { message = "This email is already in use by another user." });
+            await _userService.UpdateAsync(id, dto);
+            return NoContent();
         }
-
-        existing.FullName = dto.FullName.Trim();
-        existing.Email = normalizedEmail;
-        existing.RoleId = dto.RoleId;
-
-        // Update password if provided
-        if (!string.IsNullOrWhiteSpace(dto.Password))
+        catch (ArgumentException ex)
         {
-            existing.PasswordHash = _passwordHasher.HashPassword(existing, dto.Password.Trim());
+            return BadRequest(new { message = ex.Message });
         }
-
-        await _userRepository.UpdateAsync(existing);
-        return NoContent();
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var user = await _userRepository.GetByIdAsync(id);
-        if (user == null) return NotFound();
-
-        await _userRepository.DeleteAsync(user);
-        return NoContent();
-    }
-
-    private static UserResponseDto MapToDto(User user, string? roleName = null, string? roleColor = null)
-    {
-        return new UserResponseDto
+        try
         {
-            Id = user.Id,
-            FullName = user.FullName,
-            Email = user.Email,
-            RoleId = user.RoleId,
-            RoleName = roleName ?? user.Role?.Name ?? "",
-            RoleColor = roleColor ?? user.Role?.Color ?? ""
-        };
+            await _userService.DeleteAsync(id);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 }

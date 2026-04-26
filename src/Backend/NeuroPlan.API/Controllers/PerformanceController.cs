@@ -1,10 +1,8 @@
 using System;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NeuroPlan.API.Settings;
-using NeuroPlan.Application.DTOs;
-using NeuroPlan.Domain.Interfaces;
+using NeuroPlan.Application.Interfaces;
 
 namespace NeuroPlan.API.Controllers;
 
@@ -13,37 +11,17 @@ namespace NeuroPlan.API.Controllers;
 [Authorize(Policy = AuthorizationPolicies.PerformanceRead)]
 public class PerformanceController : ControllerBase
 {
-    private readonly IWorklogRepository _worklogRepository;
+    private readonly IPerformanceService _performanceService;
 
-    public PerformanceController(IWorklogRepository worklogRepository)
+    public PerformanceController(IPerformanceService performanceService)
     {
-        _worklogRepository = worklogRepository;
+        _performanceService = performanceService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetPerformanceData()
     {
-        var worklogs = await _worklogRepository.GetAllWithDetailsAsync();
-
-        var entries = worklogs
-            .Where(w => w.EndTime != null)
-            .GroupBy(w => new
-            {
-                ProjectId = w.TaskItem.ProjectId,
-                ProjectName = w.TaskItem.Project.Name,
-                UserFullName = w.User.FullName
-            })
-            .Select(g => new PerformanceEntryDto
-            {
-                ProjectId = g.Key.ProjectId,
-                ProjectName = g.Key.ProjectName,
-                UserFullName = g.Key.UserFullName,
-                TotalMinutes = g.Sum(w => (w.EndTime!.Value - w.StartTime).TotalMinutes)
-            })
-            .OrderBy(e => e.ProjectName)
-            .ThenByDescending(e => e.TotalMinutes)
-            .ToList();
-
+        var entries = await _performanceService.GetPerformanceDataAsync();
         return Ok(entries);
     }
 }

@@ -27,4 +27,13 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             .Include(u => u.Role)
             .FirstOrDefaultAsync(u => u.Id == id);
     }
+
+    public async Task<User?> GetByEmailWithRolePermissionsAsync(string email)
+    {
+        return await _dbSet
+            .Include(user => user.Role)
+                .ThenInclude(role => role.RolePermissions)
+                    .ThenInclude(link => link.Permission)
+            .FirstOrDefaultAsync(user => user.Email == email);
+    }
 }

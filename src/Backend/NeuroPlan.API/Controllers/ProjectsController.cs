@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using NeuroPlan.API.Settings;
 using NeuroPlan.Application.DTOs;
 using NeuroPlan.Application.Interfaces;
-using NeuroPlan.Domain.Entities;
-using NeuroPlan.Domain.Interfaces;
 
 
 namespace NeuroPlan.API.Controllers;
@@ -14,12 +12,12 @@ namespace NeuroPlan.API.Controllers;
 [Authorize]
 public class ProjectsController : ControllerBase
 {
-    private readonly IProjectRepository _projectRepository;
+    private readonly IProjectService _projectService;
     private readonly IForecastService _forecastService;
 
-    public ProjectsController(IProjectRepository projectRepository, IForecastService forecastService)
+    public ProjectsController(IProjectService projectService, IForecastService forecastService)
     {
-        _projectRepository = projectRepository;
+        _projectService = projectService;
         _forecastService = forecastService;
     }
 
@@ -27,70 +25,66 @@ public class ProjectsController : ControllerBase
     [Authorize(Policy = AuthorizationPolicies.ProjectsRead)]
     public async Task<IActionResult> GetAll()
     {
-        var projects = await _projectRepository.GetAllAsync();
-        return Ok(projects.Select(MapToDto));
+        var projects = await _projectService.GetAllAsync();
+        return Ok(projects);
     }
 
     [HttpGet("{id:guid}")]
     [Authorize(Policy = AuthorizationPolicies.ProjectsRead)]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var project = await _projectRepository.GetByIdAsync(id);
+        var project = await _projectService.GetByIdAsync(id);
         if (project == null) return NotFound();
-        return Ok(MapToDto(project));
+        return Ok(project);
     }
 
     [HttpPost]
     [Authorize(Policy = AuthorizationPolicies.ProjectsManage)]
     public async Task<IActionResult> Create([FromBody] CreateProjectRequestDto request)
     {
-        if (string.IsNullOrWhiteSpace(request.Name))
+        try
         {
-            return BadRequest(new { message = "Name is required." });
+            var project = await _projectService.CreateAsync(request);
+            return CreatedAtAction(nameof(GetById), new { id = project.Id }, project);
         }
-
-        var project = new Project
+        catch (ArgumentException ex)
         {
-            Name = request.Name.Trim(),
-            ProjectCode = request.ProjectCode?.Trim() ?? string.Empty,
-            Description = request.Description?.Trim() ?? string.Empty,
-            TargetEndDate = request.TargetEndDate
-        };
-
-        await _projectRepository.AddAsync(project);
-        return CreatedAtAction(nameof(GetById), new { id = project.Id }, MapToDto(project));
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id:guid}")]
     [Authorize(Policy = AuthorizationPolicies.ProjectsManage)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProjectRequestDto request)
     {
-        if (string.IsNullOrWhiteSpace(request.Name))
+        try
         {
-            return BadRequest(new { message = "Name is required." });
+            await _projectService.UpdateAsync(id, request);
+            return NoContent();
         }
-
-        var existing = await _projectRepository.GetByIdAsync(id);
-        if (existing == null) return NotFound();
-
-        existing.Name = request.Name.Trim();
-        existing.ProjectCode = request.ProjectCode?.Trim() ?? string.Empty;
-        existing.Description = request.Description?.Trim() ?? string.Empty;
-        existing.TargetEndDate = request.TargetEndDate;
-
-        _projectRepository.Update(existing);
-        return NoContent();
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpDelete("{id:guid}")]
     [Authorize(Policy = AuthorizationPolicies.ProjectsManage)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var project = await _projectRepository.GetByIdAsync(id);
-        if (project == null) return NotFound();
-
-        _projectRepository.Delete(project);
-        return NoContent();
+        try
+        {
+            await _projectService.DeleteAsync(id);
+            return NoContent();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     [HttpGet("{id:guid}/forecast")]
@@ -106,19 +100,5 @@ public class ProjectsController : ControllerBase
         {
             return BadRequest(new { Message = ex.Message });
         }
-    }
-
-
-
-    private static ProjectResponseDto MapToDto(Project project)
-    {
-        return new ProjectResponseDto
-        {
-            Id = project.Id,
-            Name = project.Name,
-            ProjectCode = project.ProjectCode,
-            Description = project.Description,
-            TargetEndDate = project.TargetEndDate
-        };
     }
 }

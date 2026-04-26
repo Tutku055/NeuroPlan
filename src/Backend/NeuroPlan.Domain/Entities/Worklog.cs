@@ -12,4 +12,14 @@ public class Worklog : BaseEntity
 
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
+
+    public void End(DateTime endTime)
+    {
+        if (endTime < StartTime)
+        {
+            throw new InvalidOperationException("End time cannot be earlier than start time.");
+        }
+
+        EndTime = endTime;
+    }
 }

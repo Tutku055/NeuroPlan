@@ -9,4 +9,5 @@ public interface IUserRepository : IGenericRepository<User>
 {
     Task<IEnumerable<User>> GetAllWithRolesAsync();
     Task<User?> GetByIdWithRoleAsync(Guid id);
+    Task<User?> GetByEmailWithRolePermissionsAsync(string email);
 }

@@ -61,13 +61,12 @@ public class WorkTrackingService : IWorkTrackingService
             throw new Exception("No active worklog found for this task and user.");
         }
 
-        activeWorklog.EndTime = DateTime.UtcNow;
+        activeWorklog.End(DateTime.UtcNow);
         await _worklogRepository.UpdateAsync(activeWorklog);
 
         if (isTaskCompleted)
         {
-            task.Status = EntityStatus.Completed;
-            task.CompletedDate = DateTime.UtcNow;
+            task.MarkCompleted(DateTime.UtcNow);
             await _taskItemRepository.UpdateAsync(task);
         }
     }
@@ -83,11 +82,11 @@ public class WorkTrackingService : IWorkTrackingService
         var activeWorklog = await _worklogRepository.GetActiveWorklogAsync(userId);
         if (activeWorklog != null && activeWorklog.TaskItemId == task.Id)
         {
-            activeWorklog.EndTime = DateTime.UtcNow;
+            activeWorklog.End(DateTime.UtcNow);
             await _worklogRepository.UpdateAsync(activeWorklog);
         }
 
-        task.Status = EntityStatus.Cancelled;
+        task.MarkCancelled();
         await _taskItemRepository.UpdateAsync(task);
     }
 }
