@@ -71,8 +71,7 @@ public class NeuroPlanDbContext : DbContext
             if (entry.State == EntityState.Deleted)
             {
                 entry.State = EntityState.Modified;
-                entry.Entity.IsDeleted = true;
-                entry.Entity.DeletedAt = System.DateTime.UtcNow;
+                entry.Entity.SoftDelete();
             }
         }
         return base.SaveChangesAsync(cancellationToken);

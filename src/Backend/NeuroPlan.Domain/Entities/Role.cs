@@ -4,12 +4,27 @@ namespace NeuroPlan.Domain.Entities;
 
 public class Role : BaseEntity
 {
-    public string Name { get; set; } = string.Empty;
-    public string Color { get; set; } = "#64748B";
+    private Role()
+    {
+    }
+
+    public Role(string name, string color)
+    {
+        UpdateDetails(name, color);
+    }
+
+    public Role(Guid id, string name, string color)
+        : base(id)
+    {
+        UpdateDetails(name, color);
+    }
+
+    public string Name { get; private set; } = string.Empty;
+    public string Color { get; private set; } = "#64748B";
 
     // Navigation properties
-    public ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
-    public ICollection<User> Users { get; set; } = new List<User>();
+    public ICollection<RolePermission> RolePermissions { get; private set; } = new List<RolePermission>();
+    public ICollection<User> Users { get; private set; } = new List<User>();
 
     public void UpdateDetails(string name, string color)
     {

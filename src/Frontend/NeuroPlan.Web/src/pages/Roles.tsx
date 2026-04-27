@@ -29,6 +29,40 @@ const EMPTY_FORM = {
   permissionIds: [] as string[],
 };
 
+const PERMISSION_FALLBACKS: Record<
+  string,
+  { label: string; description: string }
+> = {
+  ManageProjects: {
+    label: "Manage Projects",
+    description: "View, create, update, and delete projects.",
+  },
+  AssessRisk: {
+    label: "Assess Risk",
+    description: "Run AI forecast and risk analysis for projects.",
+  },
+  ManageTaskItems: {
+    label: "Manage Tasks",
+    description: "Create, update, delete, and change the status of tasks.",
+  },
+  TrackWork: {
+    label: "Track Worklogs",
+    description: "Start and stop worklogs for in-progress tasks.",
+  },
+  ViewStatistics: {
+    label: "View Performance",
+    description: "Access project and team performance analytics.",
+  },
+  ManageUsers: {
+    label: "Manage Users",
+    description: "Create, update, and deactivate user accounts.",
+  },
+  ManageRoles: {
+    label: "Manage Roles",
+    description: "Create roles and assign permissions to roles.",
+  },
+};
+
 const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({
   label,
   children,
@@ -181,9 +215,27 @@ export const Roles: React.FC = () => {
     setSaving(false);
   };
 
-  const getPermissionName = (id: string) => {
-    const p = permissions.find((p) => p.id === id);
-    return p?.label || p?.description || p?.systemName || id;
+  const getPermissionMetadata = (permission?: PermissionItem | null) => {
+    if (!permission) {
+      return {
+        label: "Unknown permission",
+        description: "No description available.",
+      };
+    }
+
+    const fallback = PERMISSION_FALLBACKS[permission.systemName];
+    return {
+      label: permission.label || fallback?.label || permission.systemName,
+      description:
+        permission.description ||
+        fallback?.description ||
+        "No description available.",
+    };
+  };
+
+  const getPermissionMetadataById = (id: string) => {
+    const permission = permissions.find((item) => item.id === id);
+    return getPermissionMetadata(permission);
   };
 
   const normalizeHexColor = (value: string) => value.trim().toUpperCase();
@@ -209,7 +261,8 @@ export const Roles: React.FC = () => {
         <div>
           <h1 style={{ marginBottom: "0.15rem" }}>Roles</h1>
           <p style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>
-            Manage roles and assign permissions.
+            Manage roles and assign permissions. Each permission controls a
+            single feature.
           </p>
         </div>
         <div className="page-header-actions">
@@ -341,12 +394,9 @@ export const Roles: React.FC = () => {
                               key={pid}
                               className="tag"
                               style={{ fontSize: "0.7rem" }}
-                              title={
-                                permissions.find((p) => p.id === pid)
-                                  ?.systemName || pid
-                              }
+                              title={`${getPermissionMetadataById(pid).description} (${permissions.find((p) => p.id === pid)?.systemName || pid})`}
                             >
-                              {getPermissionName(pid)}
+                              {getPermissionMetadataById(pid).label}
                             </span>
                           ))}
                         </div>
@@ -491,6 +541,17 @@ export const Roles: React.FC = () => {
               </div>
             </FormField>
             <FormField label="Permissions">
+              <p
+                style={{
+                  margin: "0 0 0.45rem",
+                  fontSize: "0.78rem",
+                  color: "var(--text-muted)",
+                  lineHeight: 1.45,
+                }}
+              >
+                Use <strong>Track Worklogs</strong> for worklog actions and{" "}
+                <strong>Manage Tasks</strong> only when task CRUD is required.
+              </p>
               <div
                 style={{
                   display: "flex",
@@ -513,19 +574,27 @@ export const Roles: React.FC = () => {
                     />
                     <div>
                       <div style={{ fontWeight: 500 }}>
-                        {p.label || p.description || p.systemName}
+                        {getPermissionMetadata(p).label}
                       </div>
-                      {p.description && (
-                        <div
-                          style={{
-                            fontSize: "0.72rem",
-                            color: "var(--text-muted)",
-                            marginTop: "0.1rem",
-                          }}
-                        >
-                          {p.systemName}
-                        </div>
-                      )}
+                      <div
+                        style={{
+                          fontSize: "0.72rem",
+                          color: "var(--text-muted)",
+                          marginTop: "0.1rem",
+                        }}
+                      >
+                        {getPermissionMetadata(p).description}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "0.68rem",
+                          color: "var(--text-muted)",
+                          opacity: 0.75,
+                          marginTop: "0.1rem",
+                        }}
+                      >
+                        Key: {p.systemName}
+                      </div>
                     </div>
                   </label>
                 ))}

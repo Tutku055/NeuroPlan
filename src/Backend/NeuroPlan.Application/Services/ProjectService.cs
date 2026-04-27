@@ -37,8 +37,7 @@ public class ProjectService : IProjectService
             throw new ArgumentException("Name is required.");
         }
 
-        var project = new Project();
-        project.UpdateDetails(
+        var project = new Project(
             request.Name.Trim(),
             request.ProjectCode?.Trim() ?? string.Empty,
             request.Description?.Trim() ?? string.Empty,

@@ -4,9 +4,19 @@ namespace NeuroPlan.Domain.Entities;
 
 public class RolePermission
 {
-    public Guid RoleId { get; set; }
-    public Role Role { get; set; } = null!;
+    private RolePermission()
+    {
+    }
 
-    public Guid PermissionId { get; set; }
-    public Permission Permission { get; set; } = null!;
+    public RolePermission(Guid roleId, Guid permissionId)
+    {
+        RoleId = roleId;
+        PermissionId = permissionId;
+    }
+
+    public Guid RoleId { get; private set; }
+    public Role Role { get; private set; } = null!;
+
+    public Guid PermissionId { get; private set; }
+    public Permission Permission { get; private set; } = null!;
 }

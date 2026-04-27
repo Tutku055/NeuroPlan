@@ -44,16 +44,13 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser()
               .RequireAssertion(context => HasAnyPermission(
                   context.User,
-                  Permissions.ReadProjects,
-                  Permissions.ManageProjects,
-                  Permissions.CreateProject)));
+                  Permissions.ManageProjects)));
 
     options.AddPolicy(AuthorizationPolicies.ProjectsManage, policy =>
         policy.RequireAuthenticatedUser()
               .RequireAssertion(context => HasAnyPermission(
                   context.User,
-                  Permissions.ManageProjects,
-                  Permissions.CreateProject)));
+                  Permissions.ManageProjects)));
 
     options.AddPolicy(AuthorizationPolicies.ForecastAccess, policy =>
         policy.RequireAuthenticatedUser()
@@ -66,30 +63,25 @@ builder.Services.AddAuthorization(options =>
               .RequireAssertion(context => HasAnyPermission(
                   context.User,
                   Permissions.TrackWork,
-                  Permissions.ManageTaskItems,
-                  Permissions.ManageProjects,
-                  Permissions.ReadProjects)));
+                  Permissions.ManageTaskItems)));
 
     options.AddPolicy(AuthorizationPolicies.TasksManage, policy =>
         policy.RequireAuthenticatedUser()
               .RequireAssertion(context => HasAnyPermission(
                   context.User,
-                  Permissions.ManageTaskItems,
-                  Permissions.ManageProjects)));
+                  Permissions.ManageTaskItems)));
 
     options.AddPolicy(AuthorizationPolicies.WorklogsTrack, policy =>
         policy.RequireAuthenticatedUser()
               .RequireAssertion(context => HasAnyPermission(
                   context.User,
-                  Permissions.TrackWork,
-                  Permissions.ManageTaskItems)));
+                  Permissions.TrackWork)));
 
     options.AddPolicy(AuthorizationPolicies.PerformanceRead, policy =>
         policy.RequireAuthenticatedUser()
               .RequireAssertion(context => HasAnyPermission(
                   context.User,
-                  Permissions.ViewStatistics,
-                  Permissions.ManageProjects)));
+                  Permissions.ViewStatistics)));
 
     options.AddPolicy(AuthorizationPolicies.UsersManage, policy =>
         policy.RequireAuthenticatedUser()

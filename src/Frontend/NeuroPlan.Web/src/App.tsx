@@ -25,6 +25,32 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
 };
 
 const DefaultRoute: React.FC = () => {
+  const { permissions } = useAuth();
+
+  if (permissions.includes("ManageProjects")) {
+    return <Navigate to="/projects" replace />;
+  }
+
+  if (permissions.includes("TrackWork")) {
+    return <Navigate to="/worklogs" replace />;
+  }
+
+  if (permissions.includes("ManageTaskItems")) {
+    return <Navigate to="/tasks" replace />;
+  }
+
+  if (permissions.includes("ViewStatistics")) {
+    return <Navigate to="/performance" replace />;
+  }
+
+  if (permissions.includes("ManageUsers")) {
+    return <Navigate to="/users" replace />;
+  }
+
+  if (permissions.includes("ManageRoles")) {
+    return <Navigate to="/roles" replace />;
+  }
+
   return <Navigate to="/projects" replace />;
 };
 
@@ -54,6 +80,7 @@ function App() {
             >
               <Route index element={<DefaultRoute />} />
               <Route path="projects" element={<Projects />} />
+              <Route path="tasks" element={<Tasks />} />
               <Route path="projects/:projectId/tasks" element={<Tasks />} />
               <Route path="worklogs" element={<Worklogs />} />
               <Route path="performance" element={<Performance />} />

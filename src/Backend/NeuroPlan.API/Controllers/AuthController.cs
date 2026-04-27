@@ -53,6 +53,7 @@ public class AuthController : ControllerBase
             new("Id", authenticatedUser.UserId.ToString()),
             new(JwtRegisteredClaimNames.Sub, authenticatedUser.Email),
             new(ClaimTypes.Role, authenticatedUser.Role),
+            new("RoleColor", authenticatedUser.RoleColor),
             new("Permissions", packedPermissions)
         };
 
@@ -75,6 +76,7 @@ public class AuthController : ControllerBase
         {
             Token = jwtToken,
             Role = authenticatedUser.Role,
+            RoleColor = authenticatedUser.RoleColor,
             Permissions = permissions
         });
     }

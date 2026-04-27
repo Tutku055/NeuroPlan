@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Lock, User, Target, ArrowRight, Brain } from "lucide-react";
+import { Lock, User, ArrowRight, Brain } from "lucide-react";
 import axios from "axios";
 
 export const Login: React.FC = () => {
@@ -21,14 +21,15 @@ export const Login: React.FC = () => {
         "http://127.0.0.1:5000/api/auth/login",
         { username, password },
       );
-      const { token, role, permissions } = response.data;
+      const { token, role, permissions, roleColor } = response.data;
 
       // Fallback in case the API doesn't camelCase
       const actualToken = token || response.data.Token;
       const actualRole = role || response.data.Role;
       const actualPermissions = permissions || response.data.Permissions;
+      const actualRoleColor = roleColor || response.data.RoleColor;
 
-      login(actualToken, actualRole, actualPermissions);
+      login(actualToken, actualRole, actualPermissions, actualRoleColor);
       navigate("/");
     } catch (err: any) {
       setError(
@@ -219,7 +220,7 @@ export const Login: React.FC = () => {
                 marginBottom: "0.5rem",
               }}
             >
-              <Target size={18} color="var(--accent-primary)" />
+              <Brain size={18} color="var(--accent-primary)" />
               <span
                 style={{
                   fontSize: "0.8rem",

@@ -37,12 +37,7 @@ public class WorkTrackingService : IWorkTrackingService
             throw new Exception("User already has an active worklog. Please stop it first.");
         }
 
-        var worklog = new Worklog
-        {
-            TaskItemId = task.Id,
-            UserId = userId,
-            StartTime = DateTime.UtcNow
-        };
+        var worklog = new Worklog(task.Id, userId, DateTime.UtcNow);
 
         await _worklogRepository.AddAsync(worklog);
     }

@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NeuroPlan.Application.DTOs;
 using NeuroPlan.Application.Interfaces;
+using NeuroPlan.Domain.Constants;
 using NeuroPlan.Domain.Entities;
 using NeuroPlan.Domain.Interfaces;
 
@@ -14,6 +15,31 @@ public class RoleService : IRoleService
 {
     private const string DefaultRoleColor = "#64748B";
     private static readonly Regex HexColorRegex = new("^#[0-9A-Fa-f]{6}$", RegexOptions.Compiled);
+    private static readonly IReadOnlyDictionary<string, (string Label, string Description)> PermissionDisplayMetadata =
+        new Dictionary<string, (string Label, string Description)>(StringComparer.OrdinalIgnoreCase)
+        {
+            [Permissions.ManageProjects] = (
+                "Manage Projects",
+                "View, create, update, and delete projects."),
+            [Permissions.AssessRisk] = (
+                "Assess Risk",
+                "Run AI forecast and risk analysis for projects."),
+            [Permissions.ManageTaskItems] = (
+                "Manage Tasks",
+                "Create, update, delete, and change the status of tasks."),
+            [Permissions.TrackWork] = (
+                "Track Worklogs",
+                "Start and stop worklogs for in-progress tasks."),
+            [Permissions.ViewStatistics] = (
+                "View Performance",
+                "Access project and team performance analytics."),
+            [Permissions.ManageUsers] = (
+                "Manage Users",
+                "Create, update, and deactivate user accounts."),
+            [Permissions.ManageRoles] = (
+                "Manage Roles",
+                "Create roles and assign permissions to roles.")
+        };
 
     private readonly IRoleRepository _roleRepository;
     private readonly IPermissionRepository _permissionRepository;
@@ -57,8 +83,7 @@ public class RoleService : IRoleService
             throw new ArgumentException("Color must be a valid hex value like #3B82F6.");
         }
 
-        var role = new Role();
-        role.UpdateDetails(request.Name.Trim(), normalizedColor);
+        var role = new Role(request.Name.Trim(), normalizedColor);
 
         await _roleRepository.AddAsync(role);
 
@@ -66,11 +91,7 @@ public class RoleService : IRoleService
         {
             foreach (var permissionId in request.PermissionIds.Distinct())
             {
-                await _rolePermissionRepository.AddAsync(new RolePermission
-                {
-                    RoleId = role.Id,
-                    PermissionId = permissionId
-                });
+                await _rolePermissionRepository.AddAsync(new RolePermission(role.Id, permissionId));
             }
         }
 
@@ -110,11 +131,7 @@ public class RoleService : IRoleService
 
         foreach (var permissionId in newPermissionIds.Where(permissionId => !currentPermissionIds.Contains(permissionId)))
         {
-            await _rolePermissionRepository.AddAsync(new RolePermission
-            {
-                RoleId = id,
-                PermissionId = permissionId
-            });
+            await _rolePermissionRepository.AddAsync(new RolePermission(id, permissionId));
         }
 
         await _roleRepository.UpdateAsync(existing);
@@ -147,8 +164,8 @@ public class RoleService : IRoleService
         {
             Id = permission.Id,
             SystemName = permission.SystemName,
-            Label = string.IsNullOrWhiteSpace(permission.Description) ? permission.SystemName : permission.Description,
-            Description = permission.Description
+            Label = GetPermissionLabel(permission.SystemName, permission.Description),
+            Description = GetPermissionDescription(permission.SystemName, permission.Description)
         });
     }
 
@@ -172,5 +189,27 @@ public class RoleService : IRoleService
 
         var normalized = color.Trim().ToUpperInvariant();
         return HexColorRegex.IsMatch(normalized) ? normalized : null;
+    }
+
+    private static string GetPermissionLabel(string systemName, string? fallbackDescription)
+    {
+        if (PermissionDisplayMetadata.TryGetValue(systemName, out var metadata))
+        {
+            return metadata.Label;
+        }
+
+        return string.IsNullOrWhiteSpace(fallbackDescription) ? systemName : fallbackDescription;
+    }
+
+    private static string GetPermissionDescription(string systemName, string? fallbackDescription)
+    {
+        if (PermissionDisplayMetadata.TryGetValue(systemName, out var metadata))
+        {
+            return metadata.Description;
+        }
+
+        return string.IsNullOrWhiteSpace(fallbackDescription)
+            ? "No description available."
+            : fallbackDescription;
     }
 }

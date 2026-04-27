@@ -90,9 +90,11 @@ export const Tasks: React.FC = () => {
   const { permissions } = useAuth();
   const { toast, confirm } = useToast();
 
-  const canManage =
+  const canAccessTasks =
     permissions.includes("ManageTaskItems") ||
-    permissions.includes("ManageProjects");
+    permissions.includes("TrackWork");
+  const canManage = permissions.includes("ManageTaskItems");
+  const canReadProjects = permissions.includes("ManageProjects");
 
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [projectsMap, setProjectsMap] = useState<Record<string, string>>({});
@@ -105,18 +107,28 @@ export const Tasks: React.FC = () => {
   const [projectName, setProjectName] = useState("");
 
   const fetchTasks = async () => {
+    if (!canAccessTasks) {
+      setTasks([]);
+      return;
+    }
+
     setLoading(true);
     try {
-      if (projectId) {
-        const projRes = await api.get(`/projects/${projectId}`);
-        setProjectName(projRes.data.name);
+      if (canReadProjects) {
+        if (projectId) {
+          const projRes = await api.get(`/projects/${projectId}`);
+          setProjectName(projRes.data.name);
+        } else {
+          const projRes = await api.get("/projects");
+          const pMap: Record<string, string> = {};
+          projRes.data.forEach((p: any) => {
+            pMap[p.id] = p.name;
+          });
+          setProjectsMap(pMap);
+        }
       } else {
-        const projRes = await api.get("/projects");
-        const pMap: Record<string, string> = {};
-        projRes.data.forEach((p: any) => {
-          pMap[p.id] = p.name;
-        });
-        setProjectsMap(pMap);
+        setProjectName("");
+        setProjectsMap({});
       }
 
       const res = await api.get("/tasks");
@@ -130,7 +142,23 @@ export const Tasks: React.FC = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [projectId]);
+  }, [projectId, canAccessTasks, canReadProjects]);
+
+  if (!canAccessTasks) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+          color: "var(--text-muted)",
+        }}
+      >
+        Access Denied. You do not have permission to access tasks.
+      </div>
+    );
+  }
 
   const openCreate = () => {
     setEditTarget(null);

@@ -50,17 +50,12 @@ public class TaskService : ITaskService
             throw new ArgumentException("Status is invalid.");
         }
 
-        var task = new TaskItem
-        {
-            Id = Guid.NewGuid(),
-            ProjectId = request.ProjectId
-        };
-
-        task.UpdateDetails(
+        var task = new TaskItem(
+            request.ProjectId,
+            request.TaskCode ?? string.Empty,
             request.Title.Trim(),
             request.Description ?? string.Empty,
-            request.ComplexityScore,
-            request.TaskCode ?? string.Empty);
+            request.ComplexityScore);
         task.ChangeStatus(status);
 
         await _taskRepository.AddAsync(task);

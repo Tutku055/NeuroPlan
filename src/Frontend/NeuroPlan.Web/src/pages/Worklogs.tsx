@@ -49,9 +49,7 @@ export const Worklogs: React.FC = () => {
   const { permissions, userId } = useAuth();
   const { toast } = useToast();
 
-  const canTrack =
-    permissions.includes("TrackWork") ||
-    permissions.includes("ManageTaskItems");
+  const canTrack = permissions.includes("TrackWork");
 
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [projects, setProjects] = useState<Record<string, string>>({});

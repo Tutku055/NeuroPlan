@@ -4,14 +4,33 @@ namespace NeuroPlan.Domain.Entities;
 
 public class Worklog : BaseEntity
 {
-    public Guid TaskItemId { get; set; }
-    public TaskItem TaskItem { get; set; } = null!;
+    private Worklog()
+    {
+    }
 
-    public Guid UserId { get; set; }
-    public User User { get; set; } = null!;
+    public Worklog(Guid taskItemId, Guid userId, DateTime startTime)
+    {
+        TaskItemId = taskItemId;
+        UserId = userId;
+        StartTime = startTime;
+    }
 
-    public DateTime StartTime { get; set; }
-    public DateTime? EndTime { get; set; }
+    public Worklog(Guid id, Guid taskItemId, Guid userId, DateTime startTime)
+        : base(id)
+    {
+        TaskItemId = taskItemId;
+        UserId = userId;
+        StartTime = startTime;
+    }
+
+    public Guid TaskItemId { get; private set; }
+    public TaskItem TaskItem { get; private set; } = null!;
+
+    public Guid UserId { get; private set; }
+    public User User { get; private set; } = null!;
+
+    public DateTime StartTime { get; private set; }
+    public DateTime? EndTime { get; private set; }
 
     public void End(DateTime endTime)
     {

@@ -1,10 +1,21 @@
 import React from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { LayoutDashboard, LogOut, Target, User, Zap, Activity, BarChart3, Users, Shield } from "lucide-react";
+import {
+  LayoutDashboard,
+  LogOut,
+  Brain,
+  User,
+  Zap,
+  Activity,
+  BarChart3,
+  Users,
+  Shield,
+  ClipboardList,
+} from "lucide-react";
 
 export const DashboardLayout: React.FC = () => {
-  const { role, permissions, logout } = useAuth();
+  const { role, roleColor, permissions, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -15,10 +26,7 @@ export const DashboardLayout: React.FC = () => {
 
   const menuItems: { name: string; path: string; icon: React.ReactNode }[] = [];
 
-  if (
-    permissions.includes("ReadProjects") ||
-    permissions.includes("ManageProjects")
-  ) {
+  if (permissions.includes("ManageProjects")) {
     menuItems.push({
       name: "Projects",
       path: "/projects",
@@ -26,11 +34,15 @@ export const DashboardLayout: React.FC = () => {
     });
   }
 
-  if (
-    permissions.includes("TrackWork") ||
-    permissions.includes("ManageTaskItems") ||
-    role === "Admin"
-  ) {
+  if (permissions.includes("ManageTaskItems")) {
+    menuItems.push({
+      name: "Tasks",
+      path: "/tasks",
+      icon: <ClipboardList size={18} />,
+    });
+  }
+
+  if (permissions.includes("TrackWork")) {
     menuItems.push({
       name: "Worklogs",
       path: "/worklogs",
@@ -38,10 +50,7 @@ export const DashboardLayout: React.FC = () => {
     });
   }
 
-  if (
-    permissions.includes("ViewStatistics") ||
-    permissions.includes("ManageProjects")
-  ) {
+  if (permissions.includes("ViewStatistics")) {
     menuItems.push({
       name: "Performance",
       path: "/performance",
@@ -49,7 +58,7 @@ export const DashboardLayout: React.FC = () => {
     });
   }
 
-  if (permissions.includes("ManageUsers") || role === "Admin") {
+  if (permissions.includes("ManageUsers")) {
     menuItems.push({
       name: "Users",
       path: "/users",
@@ -57,7 +66,7 @@ export const DashboardLayout: React.FC = () => {
     });
   }
 
-  if (permissions.includes("ManageRoles") || role === "Admin") {
+  if (permissions.includes("ManageRoles")) {
     menuItems.push({
       name: "Roles",
       path: "/roles",
@@ -67,8 +76,9 @@ export const DashboardLayout: React.FC = () => {
 
   const isActive = (path: string) => location.pathname.startsWith(path);
 
-  const roleColor =
+  const fallbackRoleColor =
     role === "Admin" ? "#a855f7" : role === "Manager" ? "#0ea5e9" : "#10b981";
+  const effectiveRoleColor = roleColor || fallbackRoleColor;
 
   return (
     <div className="app-shell">
@@ -95,7 +105,7 @@ export const DashboardLayout: React.FC = () => {
                 flexShrink: 0,
               }}
             >
-              <Target size={18} color="#fff" />
+              <Brain size={18} color="#fff" />
             </div>
             <span
               className="text-gradient"
@@ -124,14 +134,14 @@ export const DashboardLayout: React.FC = () => {
                 width: 22,
                 height: 22,
                 borderRadius: "50%",
-                background: `${roleColor}22`,
-                border: `1.5px solid ${roleColor}55`,
+                background: `${effectiveRoleColor}22`,
+                border: `1.5px solid ${effectiveRoleColor}55`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <User size={11} color={roleColor} />
+              <User size={11} color={effectiveRoleColor} />
             </div>
             <span
               style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}
@@ -142,7 +152,7 @@ export const DashboardLayout: React.FC = () => {
               style={{
                 fontSize: "0.75rem",
                 fontWeight: 600,
-                color: roleColor,
+                color: effectiveRoleColor,
                 marginLeft: "auto",
               }}
             >

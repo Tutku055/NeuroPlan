@@ -41,86 +41,216 @@ const ForecastDisplay: React.FC<{ data: any }> = ({ data }) => {
   if (data.error) {
     return (
       <div className="forecast-block error animate-fade-y">
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            marginBottom: "0.5rem",
+          }}
+        >
           <AlertTriangle size={16} color="var(--accent-rose)" />
-          <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--accent-rose)" }}>
+          <span
+            style={{
+              fontSize: "0.9rem",
+              fontWeight: 600,
+              color: "var(--accent-rose)",
+            }}
+          >
             Analysis Interrupted
           </span>
         </div>
-        <p style={{ fontSize: "0.85rem", color: "rgba(244, 63, 94, 0.8)", margin: 0 }}>
+        <p
+          style={{
+            fontSize: "0.85rem",
+            color: "rgba(244, 63, 94, 0.8)",
+            margin: 0,
+          }}
+        >
           {data.error}
         </p>
       </div>
     );
   }
 
-  const { predictedCompletionDate, riskStatus, currentVelocity, remainingComplexity } = data;
+  const {
+    predictedCompletionDate,
+    riskStatus,
+    currentVelocity,
+    remainingComplexity,
+  } = data;
 
   // Status configuration
   const statusConfig = {
-    1: { label: "On Track", color: "var(--accent-emerald)", icon: <Activity size={18} />, desc: "Project is progressing as planned." },
-    2: { label: "Safe", color: "var(--accent-secondary)", icon: <Sparkles size={18} />, desc: "Project is likely to finish ahead of schedule." },
-    3: { label: "Risky", color: "var(--accent-rose)", icon: <AlertTriangle size={18} />, desc: "Potential delay detected. Review resource allocation." }
+    1: {
+      label: "On Track",
+      color: "var(--accent-emerald)",
+      icon: <Activity size={18} />,
+      desc: "Project is progressing as planned.",
+    },
+    2: {
+      label: "Safe",
+      color: "var(--accent-secondary)",
+      icon: <Sparkles size={18} />,
+      desc: "Project is likely to finish ahead of schedule.",
+    },
+    3: {
+      label: "Risky",
+      color: "var(--accent-rose)",
+      icon: <AlertTriangle size={18} />,
+      desc: "Potential delay detected. Review resource allocation.",
+    },
   };
 
-  const status = statusConfig[riskStatus as keyof typeof statusConfig] || statusConfig[1];
+  const status =
+    statusConfig[riskStatus as keyof typeof statusConfig] || statusConfig[1];
   const date = new Date(predictedCompletionDate).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
-    year: "numeric"
+    year: "numeric",
   });
 
   return (
-    <div className="forecast-block animate-fade-y" style={{ 
-      background: `linear-gradient(145deg, rgba(0,0,0,0.3), ${status.color}08)`,
-      borderColor: `${status.color}33`,
-      padding: '1.5rem'
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+    <div
+      className="forecast-block animate-fade-y"
+      style={{
+        background: `linear-gradient(145deg, rgba(0,0,0,0.3), ${status.color}08)`,
+        borderColor: `${status.color}33`,
+        padding: "1.5rem",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: "1.25rem",
+        }}
+      >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.25rem' }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.6rem",
+              marginBottom: "0.25rem",
+            }}
+          >
             <span style={{ color: status.color }}>{status.icon}</span>
-            <h3 style={{ fontSize: '1.1rem', margin: 0, color: '#fff' }}>Neuro-Forecast</h3>
+            <h3 style={{ fontSize: "1.1rem", margin: 0, color: "#fff" }}>
+              Neuro-Forecast
+            </h3>
           </div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
+          <p
+            style={{
+              fontSize: "0.8rem",
+              color: "var(--text-muted)",
+              margin: 0,
+            }}
+          >
             Predictive AI analysis based on current velocity
           </p>
         </div>
-        <div className="status-badge" style={{ 
-          background: `${status.color}15`, 
-          color: status.color, 
-          border: `1px solid ${status.color}30`,
-          padding: '0.3rem 0.8rem',
-          fontSize: '0.75rem',
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em'
-        }}>
+        <div
+          className="status-badge"
+          style={{
+            background: `${status.color}15`,
+            color: status.color,
+            border: `1px solid ${status.color}30`,
+            padding: "0.3rem 0.8rem",
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+          }}
+        >
           {status.label}
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
-        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.03)' }}>
-          <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Predicted Completion</span>
-          <span style={{ display: 'block', fontSize: '1rem', fontWeight: 600, color: 'var(--text-main)' }}>{date}</span>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "1rem",
+          marginBottom: "1.25rem",
+        }}
+      >
+        <div
+          style={{
+            background: "rgba(0,0,0,0.2)",
+            padding: "1rem",
+            borderRadius: "12px",
+            border: "1px solid rgba(255,255,255,0.03)",
+          }}
+        >
+          <span
+            style={{
+              display: "block",
+              fontSize: "0.7rem",
+              color: "var(--text-muted)",
+              textTransform: "uppercase",
+              marginBottom: "0.4rem",
+            }}
+          >
+            Predicted Completion
+          </span>
+          <span
+            style={{
+              display: "block",
+              fontSize: "1rem",
+              fontWeight: 600,
+              color: "var(--text-main)",
+            }}
+          >
+            {date}
+          </span>
         </div>
-        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.03)' }}>
-          <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Daily Velocity</span>
-          <span style={{ display: 'block', fontSize: '1rem', fontWeight: 600, color: 'var(--text-main)' }}>{currentVelocity.toFixed(2)} pts/day</span>
+        <div
+          style={{
+            background: "rgba(0,0,0,0.2)",
+            padding: "1rem",
+            borderRadius: "12px",
+            border: "1px solid rgba(255,255,255,0.03)",
+          }}
+        >
+          <span
+            style={{
+              display: "block",
+              fontSize: "0.7rem",
+              color: "var(--text-muted)",
+              textTransform: "uppercase",
+              marginBottom: "0.4rem",
+            }}
+          >
+            Daily Velocity
+          </span>
+          <span
+            style={{
+              display: "block",
+              fontSize: "1rem",
+              fontWeight: 600,
+              color: "var(--text-main)",
+            }}
+          >
+            {currentVelocity.toFixed(2)} pts/day
+          </span>
         </div>
       </div>
 
-      <div style={{ 
-        padding: '0.85rem 1rem', 
-        borderRadius: '10px', 
-        background: `${status.color}05`, 
-        borderLeft: `3px solid ${status.color}`,
-        fontSize: '0.85rem',
-        color: 'var(--text-secondary)',
-        lineHeight: 1.5
-      }}>
-        <strong>Analysis:</strong> {status.desc} Remaining complexity ({remainingComplexity} points) factored into prediction.
+      <div
+        style={{
+          padding: "0.85rem 1rem",
+          borderRadius: "10px",
+          background: `${status.color}05`,
+          borderLeft: `3px solid ${status.color}`,
+          fontSize: "0.85rem",
+          color: "var(--text-secondary)",
+          lineHeight: 1.5,
+        }}
+      >
+        <strong>Analysis:</strong> {status.desc} Remaining complexity (
+        {remainingComplexity} points) factored into prediction.
       </div>
     </div>
   );
@@ -132,10 +262,11 @@ export const Projects: React.FC = () => {
   const navigate = useNavigate();
   const { toast, confirm } = useToast();
 
-  const canManage =
-    permissions.includes("ManageProjects") ||
-    permissions.includes("CreateProject");
+  const canManage = permissions.includes("ManageProjects");
   const canForecast = permissions.includes("AssessRisk");
+  const canAccessTasks =
+    permissions.includes("ManageTaskItems") ||
+    permissions.includes("TrackWork");
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
@@ -579,16 +710,20 @@ export const Projects: React.FC = () => {
                       {forecastLoading ? "Analysing…" : "AI Forecast"}
                     </Button>
                   )}
-                  <Button
-                    onClick={() =>
-                      navigate(`/projects/${selectedProject.id}/tasks`)
-                    }
-                    icon={<ChevronRight size={14} />}
-                    style={{ fontSize: "0.82rem", padding: "0.45rem 0.85rem" }}
-                  >
-                    Tasks
-                  </Button>
-
+                  {canAccessTasks && (
+                    <Button
+                      onClick={() =>
+                        navigate(`/projects/${selectedProject.id}/tasks`)
+                      }
+                      icon={<ChevronRight size={14} />}
+                      style={{
+                        fontSize: "0.82rem",
+                        padding: "0.45rem 0.85rem",
+                      }}
+                    >
+                      Tasks
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -674,7 +809,6 @@ export const Projects: React.FC = () => {
                 }}
               >
                 {/* QR block */}
-
 
                 {/* Forecast result */}
                 {(forecastLoading || forecast) && (

@@ -53,7 +53,7 @@ public class AuthService : IAuthService
 
         if (shouldRehash)
         {
-            user.PasswordHash = _passwordHasher.HashPassword(user, providedPassword);
+            user.SetPasswordHash(_passwordHasher.HashPassword(user, providedPassword));
             await _userRepository.UpdateAsync(user);
         }
 
@@ -74,6 +74,7 @@ public class AuthService : IAuthService
             UserId = user.Id,
             Email = user.Email,
             Role = user.Role.Name,
+            RoleColor = user.Role.Color,
             Permissions = permissions
         };
     }

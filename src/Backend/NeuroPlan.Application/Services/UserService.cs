@@ -69,9 +69,8 @@ public class UserService : IUserService
             throw new ArgumentException("Invalid role.");
         }
 
-        var user = new User();
-        user.UpdateProfile(request.FullName.Trim(), normalizedEmail, request.RoleId);
-        user.PasswordHash = _passwordHasher.HashPassword(user, request.Password.Trim());
+        var user = new User(request.FullName.Trim(), normalizedEmail, request.RoleId);
+        user.SetPasswordHash(_passwordHasher.HashPassword(user, request.Password.Trim()));
 
         await _userRepository.AddAsync(user);
 
@@ -117,7 +116,7 @@ public class UserService : IUserService
 
         if (!string.IsNullOrWhiteSpace(request.Password))
         {
-            existing.PasswordHash = _passwordHasher.HashPassword(existing, request.Password.Trim());
+            existing.SetPasswordHash(_passwordHasher.HashPassword(existing, request.Password.Trim()));
         }
 
         await _userRepository.UpdateAsync(existing);
