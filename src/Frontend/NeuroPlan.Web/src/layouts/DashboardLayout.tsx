@@ -250,7 +250,7 @@ export const DashboardLayout: React.FC = () => {
             paddingBottom: "0.5rem",
           }}
         >
-          NeuroPlan v0.1.0
+          NeuroPlan By Tutku
         </p>
       </aside>
 
