@@ -342,7 +342,7 @@ export const Tasks: React.FC = () => {
           >
             Refresh
           </Button>
-          {canManage && (
+          {canManage && projectId && (
             <Button onClick={openCreate} icon={<Plus size={15} />}>
               New Task
             </Button>
@@ -445,7 +445,8 @@ export const Tasks: React.FC = () => {
           >
             <ClipboardList size={36} style={{ opacity: 0.25 }} />
             <p style={{ fontSize: "0.9rem" }}>
-              No tasks yet.{canManage && ' Click "New Task" to add one.'}
+              No tasks yet.
+              {canManage && projectId && ' Click "New Task" to add one.'}
             </p>
           </div>
         )}
