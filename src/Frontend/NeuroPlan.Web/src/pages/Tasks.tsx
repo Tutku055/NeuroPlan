@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
-  Plus,
   Pencil,
   Trash2,
   Play,
@@ -160,13 +160,6 @@ export const Tasks: React.FC = () => {
     );
   }
 
-  const openCreate = () => {
-    setEditTarget(null);
-    setForm({ ...EMPTY_FORM });
-    setFormError("");
-    setShowForm(true);
-  };
-
   const openEdit = (t: TaskItem) => {
     setEditTarget(t);
     setForm({
@@ -177,6 +170,11 @@ export const Tasks: React.FC = () => {
       status: t.status,
     });
     setFormError("");
+    // Ensure modal is visible even when the page is scrolled or nested inside
+    // transformed/scrollable containers by scrolling to top before opening.
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
     setShowForm(true);
   };
 
@@ -342,11 +340,6 @@ export const Tasks: React.FC = () => {
           >
             Refresh
           </Button>
-          {canManage && (
-            <Button onClick={openCreate} icon={<Plus size={15} />}>
-              New Task
-            </Button>
-          )}
         </div>
       </div>
 
@@ -826,100 +819,111 @@ export const Tasks: React.FC = () => {
 
       {/* Modal */}
       {/* Modal */}
-      {showForm && (
-        <Modal
-          title={editTarget ? "Edit Task" : "New Task"}
-          onClose={() => setShowForm(false)}
-        >
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+      {showForm &&
+        createPortal(
+          <Modal
+            title={editTarget ? "Edit Task" : "New Task"}
+            onClose={() => setShowForm(false)}
           >
-            {formError && (
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+            >
+              {formError && (
+                <div
+                  style={{
+                    padding: "0.65rem 0.9rem",
+                    background: "rgba(244,63,94,0.1)",
+                    border: "1px solid rgba(244,63,94,0.25)",
+                    color: "#fb7185",
+                    borderRadius: 8,
+                    fontSize: "0.84rem",
+                  }}
+                >
+                  {formError}
+                </div>
+              )}
+              <FormField label="Task Code">
+                <InputField
+                  placeholder="e.g. TASK-001"
+                  value={form.taskCode}
+                  onChange={(e) =>
+                    setForm({ ...form, taskCode: e.target.value })
+                  }
+                />
+              </FormField>
+              <FormField label="Title *">
+                <InputField
+                  placeholder="Task title"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                />
+              </FormField>
+              <FormField label="Description">
+                <textarea
+                  placeholder="Details"
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
+                  className="input-field"
+                  rows={3}
+                  style={{ resize: "vertical", lineHeight: 1.6 }}
+                />
+              </FormField>
+              <FormField label="Complexity (1 - 10)">
+                <InputField
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={String(form.complexityScore)}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      complexityScore: Number(e.target.value),
+                    })
+                  }
+                />
+              </FormField>
+              <FormField label="Status">
+                <select
+                  value={form.status}
+                  onChange={(e) =>
+                    setForm({ ...form, status: Number(e.target.value) })
+                  }
+                  className="input-field"
+                >
+                  {Object.entries(STATUS_LABELS).map(([k, v]) => (
+                    <option key={k} value={k}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
               <div
                 style={{
-                  padding: "0.65rem 0.9rem",
-                  background: "rgba(244,63,94,0.1)",
-                  border: "1px solid rgba(244,63,94,0.25)",
-                  color: "#fb7185",
-                  borderRadius: 8,
-                  fontSize: "0.84rem",
+                  display: "flex",
+                  gap: "0.75rem",
+                  justifyContent: "flex-end",
+                  marginTop: "0.25rem",
+                  paddingTop: "0.75rem",
+                  borderTop: "1px solid var(--glass-border)",
                 }}
               >
-                {formError}
+                <Button variant="secondary" onClick={() => setShowForm(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSave} disabled={saving}>
+                  {saving
+                    ? "Saving"
+                    : editTarget
+                      ? "Update Task"
+                      : "Create Task"}
+                </Button>
               </div>
-            )}
-            <FormField label="Task Code">
-              <InputField
-                placeholder="e.g. TASK-001"
-                value={form.taskCode}
-                onChange={(e) => setForm({ ...form, taskCode: e.target.value })}
-              />
-            </FormField>
-            <FormField label="Title *">
-              <InputField
-                placeholder="Task title"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-              />
-            </FormField>
-            <FormField label="Description">
-              <textarea
-                placeholder="Details"
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-                className="input-field"
-                rows={3}
-                style={{ resize: "vertical", lineHeight: 1.6 }}
-              />
-            </FormField>
-            <FormField label="Complexity (1 - 10)">
-              <InputField
-                type="number"
-                min="1"
-                max="10"
-                value={String(form.complexityScore)}
-                onChange={(e) =>
-                  setForm({ ...form, complexityScore: Number(e.target.value) })
-                }
-              />
-            </FormField>
-            <FormField label="Status">
-              <select
-                value={form.status}
-                onChange={(e) =>
-                  setForm({ ...form, status: Number(e.target.value) })
-                }
-                className="input-field"
-              >
-                {Object.entries(STATUS_LABELS).map(([k, v]) => (
-                  <option key={k} value={k}>
-                    {v}
-                  </option>
-                ))}
-              </select>
-            </FormField>
-            <div
-              style={{
-                display: "flex",
-                gap: "0.75rem",
-                justifyContent: "flex-end",
-                marginTop: "0.25rem",
-                paddingTop: "0.75rem",
-                borderTop: "1px solid var(--glass-border)",
-              }}
-            >
-              <Button variant="secondary" onClick={() => setShowForm(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSave} disabled={saving}>
-                {saving ? "Saving" : editTarget ? "Update Task" : "Create Task"}
-              </Button>
             </div>
-          </div>
-        </Modal>
-      )}
+          </Modal>,
+          document.body,
+        )}
     </div>
   );
 };
